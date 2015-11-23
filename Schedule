@@ -1,0 +1,265 @@
+/* List of updates:
+************** WEEK 1 *********************
+Kim - dayOfWeek [1,7] & time [1,24] constraints
+************** WEEK 2 *********************
+Kim - began implementing schedule manager class 
+
+To Do: 
+1. Constraint - a person should not be able to input overlapping times 
+	(i.e. on a Monday, a person cannot input a time from 1-5 and another time from 3-7 (3-5 are "overlapping: times))
+2. Constraint - create a method to handle when user inputs a string for int variable (variables include: time, day of week, yes or no, etc)
+3. Schedule Manager - editPerson & createSchedule methods
+4. Change variables to Const (Days of week)
+*/
+
+#include <iostream>
+#include <ctime>
+#include <string>
+#include <vectors>
+
+class Time
+{
+  private:
+    int startHour;
+    int endHour;
+
+  public:
+
+    //Hours should be in military time
+    Time(int startHour, int endHour)
+    {
+      this->startHour = startHour;
+      this->endHour = endHour;
+    }
+    void setTime(int startHour, int endHour)
+    {
+
+    }
+    void deleteTime(int startHour, int endHour)
+    {
+			
+    }
+
+};
+
+class Day
+{
+  private:
+    //Person p;
+    int priority;
+    std::vector<Time*> today;
+
+  public:
+
+    void setPerson(std::string firstName, std::string lastName)
+    {
+				
+    }
+    void setPriority(int priority)
+    {
+
+    }
+
+    //Insert Time object based on startHour and endHour
+    void insertTime(int startHour, int endHour)
+    {
+      Time* t = new Time(startHour, endHour);
+      today.push_back(t);
+    }
+    void deleteTime(int startHour, int endHour)
+    {
+
+    }
+};
+
+class Person
+{
+  private:
+    std::string firstName;
+    std::string lastName;
+    //Holds all the days and times for each week for a single person. Essentially, this is a person’s individual “schedule.”
+    //Days are 1-7, starting from Sunday and ending with Saturday
+    Day week[7];
+
+  public:
+    Person(std::string firstName, std::string lastName)
+    {
+      this->firstName = firstName;
+      this->lastName = lastName;
+
+      //tentative menu
+      std::cout << "Insert a time? (0=No, 1=Yes): ";
+      int N=0; std::cin >> N;
+			//tentative menu
+      while (N == 1)
+      {
+        std::cout << "Day of Week: ";
+        int dayOfWeek=0; std::cin >> dayOfWeek;
+        
+      //****** Constraint:"dayOfWeek" limited to values [1,7] *****
+      bool notValidw = true;
+      while (notValidw)
+      {
+        if(dayOfWeek>0 && dayOfWeek<8)
+        {
+          notValidw = false;
+        }
+        else
+        {
+        std::cout << "Please input valid day of the week : ";
+        std::cin >> dayOfWeek;
+        }
+      }
+
+      std::cout << "Start time: ";
+      int startTime; std::cin >> startTime;
+
+      //****** Constraint: Start time limited to [1,24] *****
+      bool notValids = true;
+      while (notValids)
+      {
+        if(startTime>0 && startTime <25)
+        {
+          notValids = false;
+        }
+        else
+        {
+          std::cout << "Please input valid start time: ";
+          std::cin >> startTime;
+        }
+      }
+
+      std::cout << "End time: ";
+      int endTime; std::cin >> endTime;
+
+     //****** Constraint: End time limited to [1,24] *****
+      bool notValide = true;
+      while (notValide)
+      {
+        if(endTime>0 && endTime<25)
+        {
+          notValide = false;
+        }
+        else
+        {
+          std::cout << "Please input valid end time: ";
+          std::cin >> endTime;
+        }
+      }
+          insertTime(dayOfWeek, startTime, endTime);
+          std::cout << "Insert a time? (0=No, 1=Yes): ";
+          std::cin >> N;
+        }
+    }
+  
+    void insertTime(int dayOfWeek, int startHour, int endHour)
+    {
+      week[dayOfWeek - 1].insertTime(startHour, endHour);
+    }
+
+    //Calls deleteTime method in Day field
+    void deleteTime(int dayOfWeek, int startHour, int endHour)
+    {
+
+    }
+    std::string returnName()
+    {
+			std::string fullName = firstName + lastName;
+      return fullName;
+    }
+    Day* returnWeek()
+    {
+
+    }
+};
+
+class scheduleManager
+{
+	private:
+		std::vector<*Person> team;
+		Day meetingWeek[7]; //Stores possible meeting times
+
+	public:
+		void addPerson(std::string firstName, std::string lastName) // Add person to team vector
+		{
+			Person* p = new Person;
+			p->firstName = firstName;
+			p->lastName = lastName;
+			team.push_back(p);
+		}
+		void removePerson(std::string firstName, std::string lastName) //Remove person from team vector
+		{
+			for (int i=0 ; i<= team.size(); i++ )
+			{
+				if(team[i]->returnName() == (firstName+lastName))
+				{
+					team.pop_back(team[i]); //pop_back will only remove the last vector element, needs to find vector element and use team.erase()
+				}
+			}
+		}
+		void editPerson (std::string firstName, std::string lastName)
+		{
+			
+		}
+		void createSchedule () //Analyze team's schedule (from team vector)  -> stores opening times (in meetingWeek Array)
+		{
+
+		}
+};
+
+int main()
+{
+	std::vector<Person*> group;
+	
+  //tentative menu
+	int input=1;
+
+	//tentative menu
+	while (input != 0)
+	{    
+		std::cout << "\nEnter '1' to create a new team member.\n";
+    std::cout << "Enter 2 to remove a team member.\n";
+    std::cout << "Enter 3 to change a schedule. \n";
+    std::cout << "Enter 4 to output meeting times. \n";
+    std::cout << "Enter '0' to end.\n\n";
+		std::cin >> input;
+    
+    switch(input) {
+      case 1:
+			std::cout << "Enter your first (press enter) and last name (press enter):\n\n";
+			std::string firstName; std::cin >> firstName;
+			std::string lastName;  std::cin >> lastName;
+			Person* p = new Person(firstName, lastName);
+			group.push_back(p);
+      break;
+      
+      case 2:
+      std::cout <<"Enter the first name of person to be removed:\n";
+      std::string firstName; std::cin >> firstName;
+      std::cout <<"Enter the last name of person to be removed:\n";
+      std::string lastName; std::cin >> lastName;
+      removePerson(firstName,lastName);
+      break;
+      
+      case 3:
+      std::cout <<"Enter the first name of person to change schedule: \n";
+      std::string firstName; std::cin >> firstName;
+      std::cout <<"Enter the last name of person to change schedule: \n";
+      std::string lastName; std::cin >> lastName;
+      editPerson(firstName,lastName);
+      
+      break;
+      
+      case 4:
+      //code
+      break;
+      
+      default:
+      std::cout << "Please enter a correct option.\n\n";
+      break;		
+	}
+    return 0;
+}
+
+
+
