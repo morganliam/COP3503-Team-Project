@@ -16,6 +16,7 @@ To Do:
 #include <ctime>
 #include <string>
 #include <vectors>
+#include <algorithm>
 
 class Time
 {
@@ -24,22 +25,20 @@ class Time
     int endHour;
 
   public:
-
     //Hours should be in military time
     Time(int startHour, int endHour)
     {
       this->startHour = startHour;
       this->endHour = endHour;
     }
-    void setTime(int startHour, int endHour)
+    int getStart()
     {
-
+    return startHour;
     }
-    void deleteTime(int startHour, int endHour)
+    int getEnd()
     {
-			
+    return endHour;
     }
-
 };
 
 class Day
@@ -66,9 +65,9 @@ class Day
       Time* t = new Time(startHour, endHour);
       today.push_back(t);
     }
-    void deleteTime(int startHour, int endHour)
-    {
-
+    void deleteTime(int startHour)
+    { //needs to be fixed
+    	today.erase(std::remove(today.begin(), today.end(), //value to be searched for, today.end()); //removes time object from today vector that has starting hour startHour
     }
 };
 
@@ -164,8 +163,8 @@ class Person
     }
     std::string returnName()
     {
-			std::string fullName = firstName + lastName;
-      return fullName;
+	std::string fullName = firstName + lastName;
+        return fullName;
     }
     Day* returnWeek()
     {
@@ -182,20 +181,16 @@ class scheduleManager
 	public:
 		void addPerson(std::string firstName, std::string lastName) // Add person to team vector
 		{
-			Person* p = new Person;
+			std::string fullName = firstName + lastName;
+			Person* fullName = new Person;
 			p->firstName = firstName;
 			p->lastName = lastName;
-			team.push_back(p);
+			team.push_back(fullName);
 		}
 		void removePerson(std::string firstName, std::string lastName) //Remove person from team vector
-		{
-			for (int i=0 ; i<= team.size(); i++ )
-			{
-				if(team[i]->returnName() == (firstName+lastName))
-				{
-					team.pop_back(team[i]); //pop_back will only remove the last vector element, needs to find vector element and use team.erase()
-				}
-			}
+		{ //needs to be fixed
+			std::string fullName = firstName + lastName;
+			team.erase(std::remove(team.begin(), team.end(), //value to be searched for), team.end());
 		}
 		void editPerson (std::string firstName, std::string lastName)
 		{
@@ -217,7 +212,7 @@ int main()
 	//tentative menu
 	while (input != 0)
 	{    
-		std::cout << "\nEnter '1' to create a new team member.\n";
+    std::cout << "\nEnter '1' to create a new team member.\n";
     std::cout << "Enter 2 to remove a team member.\n";
     std::cout << "Enter 3 to change a schedule. \n";
     std::cout << "Enter 4 to output meeting times. \n";
@@ -226,11 +221,11 @@ int main()
     
     switch(input) {
       case 1:
-			std::cout << "Enter your first (press enter) and last name (press enter):\n\n";
-			std::string firstName; std::cin >> firstName;
-			std::string lastName;  std::cin >> lastName;
-			Person* p = new Person(firstName, lastName);
-			group.push_back(p);
+	std::cout << "Enter your first (press enter) and last name (press enter):\n\n";
+	std::string firstName; std::cin >> firstName;
+	std::string lastName;  std::cin >> lastName;
+	Person* p = new Person(firstName, lastName);
+	group.push_back(p);
       break;
       
       case 2:
