@@ -12,249 +12,248 @@ To Do:
 4. Change variables to Const (Days of week)
 */
 
+// Project.cpp : Defines the entry point for the console application.
+//
+
 #include <iostream>
-#include <ctime>
 #include <string>
-#include <vectors>
-#include <algorithm>
+#include <vector>
 
 class Time
 {
-  private:
-    int startHour;
-    int endHour;
+private:
+	int startHour;
+	int endHour;
 
-  public:
-    //Hours should be in military time
-    Time(int startHour, int endHour)
-    {
-      this->startHour = startHour;
-      this->endHour = endHour;
-    }
-    int getStart()
-    {
-    return startHour;
-    }
-    int getEnd()
-    {
-    return endHour;
-    }
+public:
+
+	//Hours should be in military time
+	Time(int startHour, int endHour)
+	{
+		this->startHour = startHour;
+		this->endHour = endHour;
+	}
+
+	int getStartHour()
+	{
+		return startHour;
+	}
+
+	int getEndHour()
+	{
+		return endHour;
+	}
+
 };
 
 class Day
 {
-  private:
-    //Person p;
-    int priority;
-    std::vector<Time*> today;
+private:
+	//Person p;
+	int priority;
+	std::vector<Time*> today;
 
-  public:
+public:
 
-    void setPerson(std::string firstName, std::string lastName)
-    {
-				
-    }
-    void setPriority(int priority)
-    {
+	//Insert Time object based on startHour and endHour
+	void insertTime(int startHour, int endHour)
+	{
+		if (endHour - startHour != 1)
+		{
+			for (int i = startHour; i < endHour; i++)
+			{
+				Time* t = new Time(i, i + 1);
+				today.push_back(t);
+			}
+		}
+		else
+		{
+			Time* t = new Time(startHour, endHour);
+			today.push_back(t);
+		}
+	
+	}
+	void deleteTime(int startHour, int endHour)
+	{
+		int n = -1; // Stores index value of time object
 
-    }
+		for (unsigned int i = 0; i < today.size(); i++)
+		{
+			int iStartHour = today.at(i)->getStartHour();
+			int iEndHour = today.at(i)->getEndHour();
 
-    //Insert Time object based on startHour and endHour
-    void insertTime(int startHour, int endHour)
-    {
-      Time* t = new Time(startHour, endHour);
-      today.push_back(t);
-    }
-    void deleteTime(int startHour)
-    { //needs to be fixed
-    	today.erase(std::remove(today.begin(), today.end(), //value to be searched for, today.end()); //removes time object from today vector that has starting hour startHour
-    }
+			if ((startHour == iStartHour) && (endHour == iEndHour))
+			{
+				n = i;
+			}
+		}
+		if (n != -1)
+		{
+			today.erase(today.begin() + n);
+		}
+		else
+		{
+			std::cout << "Start Hour: " << startHour << "End Hour: " << endHour << "could not be deleted \n\n";
+		}
+	}
+
+	//Connor just added at 10:34 PM
+	std::vector<Time*> getTime()
+	{
+		return today;
+	}
 };
 
 class Person
 {
-  private:
-    std::string firstName;
-    std::string lastName;
-    //Holds all the days and times for each week for a single person. Essentially, this is a person’s individual “schedule.”
-    //Days are 1-7, starting from Sunday and ending with Saturday
-    Day week[7];
+private:
+	std::string firstName;
+	std::string lastName;
+	//Holds all the days and times for each week for a single person. Essentially, this is a person’s individual “schedule.”
+	//Days are 1-7, starting from Sunday and ending with Saturday
+	Day week[7];
 
-  public:
-    Person(std::string firstName, std::string lastName)
-    {
-      this->firstName = firstName;
-      this->lastName = lastName;
+public:
+	Person(std::string firstName, std::string lastName)
+	{
+		this->firstName = firstName;
+		this->lastName = lastName;
 
-      //tentative menu
-      std::cout << "Insert a time? (0=No, 1=Yes): ";
-      int N=0; std::cin >> N;
-			//tentative menu
-      while (N == 1)
-      {
-        std::cout << "Day of Week: ";
-        int dayOfWeek=0; std::cin >> dayOfWeek;
-        
-      //****** Constraint:"dayOfWeek" limited to values [1,7] *****
-      bool notValidw = true;
-      while (notValidw)
-      {
-        if(dayOfWeek>0 && dayOfWeek<8)
-        {
-          notValidw = false;
-        }
-        else
-        {
-        std::cout << "Please input valid day of the week : ";
-        std::cin >> dayOfWeek;
-        }
-      }
+		//tentative menu
+		std::cout << "Insert a time? (0=No, 1=Yes): ";
+		int N; std::cin >> N;
 
-      std::cout << "Start time: ";
-      int startTime; std::cin >> startTime;
+		while (N == 1)
+		{
+			std::cout << "Day of Week: ";
+			int dayOfWeek; std::cin >> dayOfWeek;
+			std::cout << "Start time: ";
+			int startTime; std::cin >> startTime;
+			std::cout << "End time: ";
+			int endTime; std::cin >> endTime;
 
-      //****** Constraint: Start time limited to [1,24] *****
-      bool notValids = true;
-      while (notValids)
-      {
-        if(startTime>0 && startTime <25)
-        {
-          notValids = false;
-        }
-        else
-        {
-          std::cout << "Please input valid start time: ";
-          std::cin >> startTime;
-        }
-      }
+			insertTime(dayOfWeek, startTime, endTime);
+			std::cout << "Insert a time? (0=No, 1=Yes): ";
+			std::cin >> N;
+		}
+	}
 
-      std::cout << "End time: ";
-      int endTime; std::cin >> endTime;
+	/*need to add constraints:
+	-"dayOfWeek" should be limited to values [1,7].
+	-the times should be limited to values [1,24].
+	-a person should not be able to input overlapping times (i.e. on a Monday, a person cannot input a time from 1-5 and another time from 3-7 (3-5 are "overlapping: times))*/
+	void insertTime(int dayOfWeek, int startHour, int endHour)
+	{
+		week[dayOfWeek - 1].insertTime(startHour, endHour);
+	}
 
-     //****** Constraint: End time limited to [1,24] *****
-      bool notValide = true;
-      while (notValide)
-      {
-        if(endTime>0 && endTime<25)
-        {
-          notValide = false;
-        }
-        else
-        {
-          std::cout << "Please input valid end time: ";
-          std::cin >> endTime;
-        }
-      }
-          insertTime(dayOfWeek, startTime, endTime);
-          std::cout << "Insert a time? (0=No, 1=Yes): ";
-          std::cin >> N;
-        }
-    }
-  
-    void insertTime(int dayOfWeek, int startHour, int endHour)
-    {
-      week[dayOfWeek - 1].insertTime(startHour, endHour);
-    }
+	//Calls deleteTime method in Day field
+	void deleteTime(int dayOfWeek, int startHour, int endHour)
+	{
 
-    //Calls deleteTime method in Day field
-    void deleteTime(int dayOfWeek, int startHour, int endHour)
-    {
+	}
 
-    }
-    std::string returnName()
-    {
-	std::string fullName = firstName + lastName;
-        return fullName;
-    }
-    Day* returnWeek()
-    {
+	std::vector<Time*> getDay(int dayOfWeek)
+	{
+		return week[dayOfWeek].getTime();
+	}
 
-    }
+	std::string returnName()
+	{
+
+	}
+	Day* returnWeek()
+	{
+
+	}
+
+	std::string getName()
+	{
+		return firstName + " " + lastName;
+	}
 };
 
-class scheduleManager
+void outputSchedule(std::vector<Person*> group)
 {
-	private:
-		std::vector<*Person> team;
-		Day meetingWeek[7]; //Stores possible meeting times
-
-	public:
-		void addPerson(std::string firstName, std::string lastName) // Add person to team vector
+	for (int i = 0; i < 7; i++)
+	{
+		std::cout << "\n\nOn day " << i;
+		for (int j = 0; j < group.size(); j++)
 		{
-			std::string fullName = firstName + lastName;
-			Person* fullName = new Person;
-			p->firstName = firstName;
-			p->lastName = lastName;
-			team.push_back(fullName);
+			std::cout << "\n\n " << group.at(j)->getName() << " schedule is: ";
+			for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
+				std::cout << group.at(j)->getDay(i).at(k)->getStartHour() << "-" << group.at(j)->getDay(i).at(k)->getEndHour() << " , ";
 		}
-		void removePerson(std::string firstName, std::string lastName) //Remove person from team vector
-		{ //needs to be fixed
-			std::string fullName = firstName + lastName;
-			team.erase(std::remove(team.begin(), team.end(), //value to be searched for), team.end());
-		}
-		void editPerson (std::string firstName, std::string lastName)
-		{
-			
-		}
-		void createSchedule () //Analyze team's schedule (from team vector)  -> stores opening times (in meetingWeek Array)
-		{
-
-		}
-};
+	}
+}
 
 int main()
 {
 	std::vector<Person*> group;
-	
-  //tentative menu
-	int input=1;
+	std::string firstName;
+	std::string lastName;
+	int input = 1;
 
-	//tentative menu
 	while (input != 0)
-	{    
-    std::cout << "\nEnter '1' to create a new team member.\n";
-    std::cout << "Enter 2 to remove a team member.\n";
-    std::cout << "Enter 3 to change a schedule. \n";
-    std::cout << "Enter 4 to output meeting times. \n";
-    std::cout << "Enter '0' to end.\n\n";
+	{
+		std::cout << "Enter '1' to create a new team member. '2' to print. '3' to delete. '4' to print schedule. Enter '0' to end.\n\n";
 		std::cin >> input;
-    
-    switch(input) {
-      case 1:
-	std::cout << "Enter your first (press enter) and last name (press enter):\n\n";
-	std::string firstName; std::cin >> firstName;
-	std::string lastName;  std::cin >> lastName;
-	Person* p = new Person(firstName, lastName);
-	group.push_back(p);
-      break;
-      
-      case 2:
-      std::cout <<"Enter the first name of person to be removed:\n";
-      std::string firstName; std::cin >> firstName;
-      std::cout <<"Enter the last name of person to be removed:\n";
-      std::string lastName; std::cin >> lastName;
-      removePerson(firstName,lastName);
-      break;
-      
-      case 3:
-      std::cout <<"Enter the first name of person to change schedule: \n";
-      std::string firstName; std::cin >> firstName;
-      std::cout <<"Enter the last name of person to change schedule: \n";
-      std::string lastName; std::cin >> lastName;
-      editPerson(firstName,lastName);
-      
-      break;
-      
-      case 4:
-      //code
-      break;
-      
-      default:
-      std::cout << "Please enter a correct option.\n\n";
-      break;		
+		switch (input)
+		{
+		case 1:
+		{
+			std::cout << "Enter your first (press enter) and last name (press enter):\n\n";
+			std::cin >> firstName;
+			std::cin >> lastName;
+			Person* p = new Person(firstName, lastName);
+			group.push_back(p);
+		}
+		break;
+		case 2:
+		{
+			for (int i = 0; i < group.size(); i++)
+				std::cout << group.at(i)->getName() << "\n";
+		}
+		break;
+		case 3:
+		{
+			//*************** + DELETE PERSON FROM GROUP  *******************
+			std::cout << "To delete, enter the first (press enter) and last name (press enter): \n\n";
+			std::cin >> firstName;
+			std::cin >> lastName;
+			std::string name = firstName + " " + lastName;
+
+			int n = -1; // Stores index value of person in group
+
+			for (unsigned int i = 0; i < group.size(); i++)
+			{
+				std::string pName = group.at(i)->getName();
+				if (pName == name)
+				{
+					n = i;
+				}
+			}
+			if (n != -1)
+			{
+				group.erase(group.begin() + n);
+			}
+			else
+			{
+				std::cout << name << "does not exist!\n\n";
+			}
+			//**************************************************************
+		}
+		break;
+		case 4:
+		{
+			outputSchedule(group);
+		}
+		break;
+		default:
+			break;
+		}
 	}
-    return 0;
+
+	return 0;
 }
-
-
 
