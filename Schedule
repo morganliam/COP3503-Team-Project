@@ -127,11 +127,24 @@ public:
 		{
 			std::cout << "Day of Week: ";
 			int dayOfWeek; std::cin >> dayOfWeek;
+			while(dayOfWeek<1 || dayOfWeek>7) {
+				std::cout<< "Invalid day, please input again";
+				std::cin >> dayOfWeek;
+			}
+				
 			std::cout << "Start time: ";
 			int startTime; std::cin >> startTime;
+			while(startTime<0 || startTime>24) {
+				std::cout<<"Invalid start time, please input again";
+				std::cin >> startTime;
+			}
 			std::cout << "End time: ";
 			int endTime; std::cin >> endTime;
-
+			while(endTime<0 || endTime>24 || endTime!=startTime) {
+				std::cout<<"Invalid end time, please input again";
+				std::cin >> endTime;
+			}
+			
 			insertTime(dayOfWeek, startTime, endTime);
 			std::cout << "Insert a time? (0=No, 1=Yes): ";
 			std::cin >> N;
@@ -139,9 +152,8 @@ public:
 	}
 
 	/*need to add constraints:
-	-"dayOfWeek" should be limited to values [1,7].
-	-the times should be limited to values [1,24].
-	-a person should not be able to input overlapping times (i.e. on a Monday, a person cannot input a time from 1-5 and another time from 3-7 (3-5 are "overlapping: times))*/
+	-a person should not be able to input overlapping times (i.e. on a Monday, a person cannot input a time from 1-5 and another time from 3-7 (3-5 are "overlapping: times))
+	*/
 	void insertTime(int dayOfWeek, int startHour, int endHour)
 	{
 		week[dayOfWeek - 1].insertTime(startHour, endHour);
@@ -157,14 +169,10 @@ public:
 	{
 		return week[dayOfWeek].getTime();
 	}
-
-	std::string returnName()
-	{
-
-	}
+	//removed returnName as its the same as getName(), getName can be renamed if you want it to be returnName instead.
 	Day* returnWeek()
 	{
-
+		return week; 
 	}
 
 	std::string getName()
@@ -250,6 +258,7 @@ int main()
 		}
 		break;
 		default:
+			cout << "Invalid menu input << endl;
 			break;
 		}
 	}
