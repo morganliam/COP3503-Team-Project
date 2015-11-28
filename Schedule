@@ -24,6 +24,7 @@ class Time
 private:
 	int startHour;
 	int endHour;
+	int timeOccurance = 0;
 
 public:
 
@@ -33,7 +34,14 @@ public:
 		this->startHour = startHour;
 		this->endHour = endHour;
 	}
-
+	void incrimentTimeOccurance()
+	{
+		timeOccurance++;
+	}
+	int getTimeOccurance()
+	{
+		return timeOccurance;
+	}
 	int getStartHour()
 	{
 		return startHour;
@@ -73,6 +81,32 @@ public:
 		}
 	
 	}
+	//Function is used for determining the ultimateSchedule
+	void insertTimeUltimateSchedule(int startHour, int endHour)
+	{
+		bool equalsTime = false;
+		if (today.size() == 0)
+		{
+			Time* t = new Time(startHour, endHour);
+			today.push_back(t);
+		}
+		else
+		{
+			for (int i = 0; i < today.size(); i++)
+			{
+				if (today.at(i)->getStartHour() == startHour)
+				{
+					today.at(i)->incrimentTimeOccurance();
+					equalsTime = true;
+				}
+			}
+			if (!equalsTime)
+			{
+				Time* t = new Time(startHour, endHour);
+				today.push_back(t);
+			}
+		}
+	}
 	void deleteTime(int startHour, int endHour)
 	{
 		int n = -1; // Stores index value of time object
@@ -96,8 +130,7 @@ public:
 			std::cout << "Start Hour: " << startHour << "End Hour: " << endHour << "could not be deleted \n\n";
 		}
 	}
-
-	//Connor just added at 10:34 PM
+	
 	std::vector<Time*> getTime()
 	{
 		return today;
@@ -195,6 +228,49 @@ void outputSchedule(std::vector<Person*> group)
 	}
 }
 
+//Determines the best possible time for the group to meet (determines the day and times with the most overlapping time occurances)
+void ultimateSchedule(std::vector<Person*> group)
+{
+	Day groupWeek[7];
+	int timeOccurance = 0;
+
+	//goes through every day of the week
+	for (int i = 0; i < 7; i++)
+	{
+		//goes through every group member
+		for (int j = 0; j < group.size(); j++)
+		{
+			//goes through every time
+			for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
+			{
+				groupWeek[i].insertTimeUltimateSchedule(group.at(j)->getDay(i).at(k)->getStartHour(), group.at(j)->getDay(i).at(k)->getEndHour());
+			}
+		}
+	}
+
+	//sets timeOccurance with the greatest value of times that overlap
+	for (int i = 0; i < 7; i++)
+	{
+		for (int k = 0; k < groupWeek[i].getTime().size(); k++)
+		{
+			if (groupWeek[i].getTime().at(k)->getTimeOccurance() > timeOccurance)
+				timeOccurance = groupWeek[i].getTime().at(k)->getTimeOccurance();
+		}
+	}
+
+	//outputs the best time to meet
+	std::cout << "The best time for the group to meet is:\n\n";
+	for (int i = 0; i < 7; i++)
+	{
+		for (int k = 0; k < groupWeek[i].getTime().size(); k++)
+		{
+			if(timeOccurance == groupWeek[i].getTime().at(k)->getTimeOccurance())
+				std::cout << timeOccurance + 1 << " member's schedules match on day " << i << " at times " << groupWeek[i].getTime().at(k)->getStartHour() << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
+		}
+	}
+
+}
+
 int main()
 {
 	std::vector<Person*> group;
@@ -204,7 +280,7 @@ int main()
 
 	while (input != 0)
 	{
-		std::cout << "Enter '1' to create a new team member. '2' to print. '3' to delete. '4' to print schedule. Enter '0' to end.\n\n";
+		std::cout << "Enter:\n'1' to create a new team member.\n'2' to print member names.\n'3' to delete a member.\n'4' to print schedule.\n'5' to print best time to meet.\n'0' to end.\n\n";
 		std::cin >> input;
 		switch (input)
 		{
@@ -255,6 +331,11 @@ int main()
 		case 4:
 		{
 			outputSchedule(group);
+		}
+		break;
+		case 5:
+		{
+			ultimateSchedule(group);
 		}
 		break;
 		default:
