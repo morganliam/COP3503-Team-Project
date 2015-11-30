@@ -11,7 +11,7 @@ class Time
 private:
     int startHour;
     int endHour;
-    int timeoccurence = 0;
+    int timeoccurence;
 
 public:
 
@@ -20,6 +20,7 @@ public:
     {
         this->startHour = startHour;
         this->endHour = endHour;
+		timeoccurence = 0;
     }
     void incrimentTimeoccurence()
     {
@@ -186,7 +187,7 @@ public:
 
     int dayOfWeek()
     {
-    	std::cout << "Day of Week: ";
+    	std::cout << "Day of Week (by number): ";
 		int dayOfWeek=0;
 		std::cin >> dayOfWeek;
 
@@ -200,6 +201,8 @@ public:
 		}
 		else
 		{
+		std::cin.clear();
+		std::cin.ignore(100, '\n');
 		std::cout << "Please input valid day of the week : ";
 		std::cin >> dayOfWeek;
 		}
@@ -223,6 +226,8 @@ public:
 			}
 			else
 			{
+			  std::cin.clear();
+			  std::cin.ignore(100, '\n');
 			  std::cout << "Please input valid start time: ";
 			  std::cin >> startTime;
 			}
@@ -241,9 +246,12 @@ public:
 			if(endTime>0 && endTime<25)
 			{
 			  notValide = false;
+			  
 			}
 			else
 			{
+			  std::cin.clear();
+			  std::cin.ignore(100, '\n');
 			  std::cout << "Please input valid end time: ";
 			  std::cin >> endTime;
 			}
@@ -335,7 +343,17 @@ scheduleManager()
 				"'5' to edit a member's schedule.\n"
 				"'6' to print best times to meet.\n"
 				"'0' to end.\n\n";
+		bool error=true;		
 		std::cin >> input;
+		while(error){
+			if(input > -1 && input < 7) error=false;
+			else{
+				std::cin.clear();
+				std::cin.ignore(100, '\n');
+				std::cout<< "Invalid Input. Please enter a valid menu option: ";
+				std::cin >> input;
+				}
+		}
 		switch (input)
 		{
 			case 1:
