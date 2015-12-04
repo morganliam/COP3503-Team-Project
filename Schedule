@@ -378,7 +378,14 @@ public:
 			{
 				std::cout << "\n\n " << group.at(j)->getName() << " schedule is: ";
 				for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
-					std::cout << group.at(j)->getDay(i).at(k)->getStartHour() << "-" << group.at(j)->getDay(i).at(k)->getEndHour() << " , ";
+				{
+					std::cout << group.at(j)->getDay(i).at(k)->getStartHour() << "-";
+					while ((k+1) < group.at(j)->getDay(i).size() && group.at(j)->getDay(i).at(k)->getEndHour() == group.at(j)->getDay(i).at(k + 1)->getStartHour())
+					{
+						k++;
+					}
+					std::cout << group.at(j)->getDay(i).at(k)->getEndHour() << " ";
+				}
 			}
 		}
 		std::cout << "\n\n";
