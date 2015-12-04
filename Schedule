@@ -435,9 +435,19 @@ public:
 		{
 			for (int k = 0; k < groupWeek[i].getTime().size(); k++)
 			{
-				if(timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
+				if (timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
+				{
 					std::cout << timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
-					groupWeek[i].getTime().at(k)->getStartHour() << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
+						groupWeek[i].getTime().at(k)->getStartHour();
+						
+					//ensures that the times printed out are contiguous
+					while ((k + 1) < groupWeek[i].getTime().size() && timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() && groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
+					{
+						k++;
+					}
+					
+					std::cout << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
+				}
 			}
 		}
 	}
