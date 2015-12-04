@@ -138,7 +138,7 @@ public:
     {
         this->firstName = firstName;
         this->lastName = lastName;
-        insertTime();
+	insertTime();
     }
 
     /*need to add constraints:
@@ -151,8 +151,8 @@ public:
         std::cout << "Insert a time? (0=No, 1=Yes): ";
         int N;
         std::cin >> N;
-		bool error=true;
-		while(error){	
+	bool error=true;
+	while(error){	
 			if(std::cin.fail())
 			{
 				std::cin.clear();
@@ -408,32 +408,35 @@ scheduleManager()
 				"'5' to edit a member's schedule.\n"
 				"'6' to print best times to meet.\n"
 				"'0' to end.\n"
-				"___________________________________________ \n
-				"\nEnter menu option: ";
+				"___________________________________________ \n\n"
+				"Enter menu option: ";
 		bool error=true;		
 		std::cin >> input;
-		while(error){
-			
-			if(std::cin.fail()){
+		while(error)
+		{
+			if(std::cin.fail())
+			{
 				std::cin.clear();
 				std::cin.ignore(100, '\n');
 				std::cout<< "Invalid Input. Please enter a valid menu option: ";
 				std::cin >> input;
 			}
-			else if(input<0&&input>6){
-			std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> input;
-			}
-			else if(input==0 || input==1 || input==2 || input==3 || input==4 || input==5 || input==6) error=false;
-			
-			else{
+			else if(input<0&&input>6)
+			{
 				std::cin.clear();
 				std::cin.ignore(100, '\n');
 				std::cout<< "Invalid Input. Please enter a valid menu option: ";
 				std::cin >> input;
-				}
+			}
+			else if(input==0 || input==1 || input==2 || input==3 || input==4 || input==5 || input==6) 
+				error=false;
+			else
+			{
+				std::cin.clear();
+				std::cin.ignore(100, '\n');
+				std::cout<< "Invalid Input. Please enter a valid menu option: ";
+				std::cin >> input;
+			}
 		}
 
 		switch (input)
@@ -447,21 +450,56 @@ scheduleManager()
 
 				do{
 				++n;
-				if(n>1)
+				if(personExists(group,name))
 				{
 					std::cout<<"Member already exists. Please try again. \n";
-				}
-				std::cout <<"Enter the first name of person to be added:\n";
-				std::cin >> firstName;
-				std::cout <<"Enter the last name of person to be added:\n";
-				 std::cin >> lastName;
-				std::cout<<"\n";
+					break;
+				}					
+				int makesure;
+				while(makesure != 1)
+				{
+					std::cout <<"Enter the first name of person to be added:\n";
+					std::cin >> firstName;
+					std::cout <<"Enter the last name of person to be added:\n";
+					std::cin >> lastName;
+					std::cout<<"\n";
 
-				name = firstName + " " + lastName;
+					name = firstName + " " + lastName;
+				
+					std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+
+					std::cin >> makesure;
+					while(error){
+					if(std::cin.fail())
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> makesure;
+					}
+					else if(makesure<0 && makesure>1)
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> makesure;
+					}
+					else if(makesure==0 || makesure==1) 
+						error=false;
+					else
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> makesure;
+					}}}
 				}
-				while(personExists(group,name)) ;
-				Person* p = new Person(firstName, lastName);
-				group.push_back(p);
+				while(personExists(group,name));
+				if(!personExists(group,name))
+				{
+					Person* p = new Person(firstName, lastName);
+					group.push_back(p);
+				}
 			}
 				break;
 			case 2:
@@ -474,12 +512,46 @@ scheduleManager()
 			case 3:
 				{
 					//*************** + DELETE PERSON FROM GROUP  *******************
-						  std::cout <<"Enter the first name of person to be removed:\n";
-						  std::string firstName; std::cin >> firstName;
-						  std::cout <<"Enter the last name of person to be removed:\n";
-						  std::string lastName; std::cin >> lastName;
-
-						  std::string name = firstName + " " + lastName;
+						int makesure;
+						std::string name;
+						while(makesure != 1)
+						{ 
+							std::cout <<"Enter the first name of person to be removed:\n";
+							std::string firstName; 
+							std::cin >> firstName;
+							std::cout <<"Enter the last name of person to be removed:\n";
+							std::string lastName; 
+							std::cin >> lastName;
+							name = firstName + " " + lastName;
+							std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+							bool error=true;
+							std::cin >> makesure;
+							while(error){
+							if(std::cin.fail())
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure<0 && makesure>1)
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure==0 || makesure==1) 
+								error=false;
+							else
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}}
+						}
+						
 
 						int n = -1; // Stores index value of person in group
 
@@ -569,6 +641,32 @@ void editPerson(std::vector<Person*> group)
 							"'2' to delete a time.\n"
 							"'0' to return to the main menu.\n";
 				std::cin >> inputA;
+				bool error=true;
+				while(error){
+				if(std::cin.fail())
+				{
+					std::cin.clear();
+					std::cin.ignore(100, '\n');
+					std::cout<< "Invalid Input. Please enter a valid menu option: ";
+					std::cin >> inputA;
+				}
+				else if(inputA<0 && inputA>2)
+				{
+					std::cin.clear();
+					std::cin.ignore(100, '\n');
+					std::cout<< "Invalid Input. Please enter a valid menu option: ";
+					std::cin >> inputA;
+				}
+				else if(inputA==0 || inputA==1 || inputA==2) 
+					error=false;
+				else
+				{
+					std::cin.clear();
+					std::cin.ignore(100, '\n');
+					std::cout<< "Invalid Input. Please enter a valid menu option: ";
+					std::cin >> inputA;
+				}
+		}
 				switch(inputA)
 				{
 				case 1: //INSERT NEW TIME
