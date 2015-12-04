@@ -46,23 +46,50 @@ private:
 
 public:
 
-    //Insert Time object based on startHour and endHour
-    void insertTime(int startHour, int endHour)
-    {
-        if (endHour - startHour != 1)
-        {
-            for (int i = startHour; i < endHour; i++)
-            {
-                Time* t = new Time(i, i + 1);
-                today.push_back(t);
-            }
-        }
-        else
-        {
-            Time* t = new Time(startHour, endHour);
-            today.push_back(t);
-        }
-    }
+	//Insert Time object based on startHour and endHour
+	void insertTime(int startHour, int endHour)
+	{
+		if (endHour - startHour != 1)
+		{
+			for (int i = startHour; i < endHour; i++)
+			{
+				Time* t = new Time(i, i + 1);
+				if (today.size() != 0)
+				{
+					sortTime(today, t);
+				}
+				else
+					today.push_back(t);
+			}
+		}
+		else
+		{
+			Time* t = new Time(startHour, endHour);
+			if (today.size() != 0)
+			{
+				sortTime(today, t);
+			}
+			else
+				today.push_back(t);
+		}
+	}
+
+	//ensures that the times are sorted in order (least to greatest)
+	void sortTime(std::vector<Time*>& today, Time*& t)
+	{
+		bool inserted = false;
+		for (int j = 0; j < today.size(); j++)
+		{
+			it = today.begin();
+			if (t->getStartHour() < today.at(j)->getStartHour())
+			{
+				today.insert(it + j, t);
+				inserted = true;
+				break;
+			}
+		}
+		if (!inserted) today.push_back(t);
+	}
 
     void insertTimeUltimateSchedule(int startHour, int endHour)
     {
