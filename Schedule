@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <iterator>
 
 class Time
 {
@@ -43,6 +44,7 @@ private:
     //Person p;
     int priority;
     std::vector<Time*> today;
+    std::vector<Time*>::iterator it;
 
 public:
 
@@ -439,13 +441,13 @@ public:
 				{
 					std::cout << timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
 						groupWeek[i].getTime().at(k)->getStartHour();
-						
+
 					//ensures that the times printed out are contiguous
 					while ((k + 1) < groupWeek[i].getTime().size() && timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() && groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
 					{
 						k++;
 					}
-					
+
 					std::cout << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
 				}
 			}
