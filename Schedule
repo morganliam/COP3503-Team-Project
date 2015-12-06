@@ -676,7 +676,17 @@ void editPerson(std::vector<Person*> group)
 					{
 						std::cout << "\n\nOn " << dayName[i]<<" " ; //Iterates through dayName array
 						for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
-						std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-" << group.at(n)->getDay(i).at(k)->getEndHour() << " , ";
+						{
+							std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
+							//ensures that the times printed out are contiguous
+							while ((k+1) < group.at(n)->getDay(i).size() && group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
+							{
+								k++;
+							}
+
+							std::cout << group.at(n)->getDay(i).at(k)->getEndHour() << " , ";
+							}
+
 					}
 				}
 				break;
