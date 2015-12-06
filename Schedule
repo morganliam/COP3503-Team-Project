@@ -42,7 +42,6 @@ class Day
 {
 private:
     //Person p;
-    int priority;
     std::vector<Time*> today;
     std::vector<Time*>::iterator it;
 
@@ -121,26 +120,44 @@ public:
 
     void deleteTime(int startHour, int endHour)
     {
-        int n = -1; // Stores index value of time object
+    	int diff = endHour - startHour;
+    	int tempStart = startHour;
+    	int tempEnd = endHour;
 
-        for (unsigned int i = 0; i < today.size(); i++)
-        {
-            int iStartHour = today.at(i)->getStartHour();
-            int iEndHour = today.at(i)->getEndHour();
+    	//True when all times were successfully deleted
+    	bool success = true;
 
-            if ((startHour == iStartHour) && (endHour == iEndHour))
-            {
-                n = i;
-            }
-        }
-        if (n != -1)
+    	//Checks for contiguous times
+        for(unsigned int k = 1; k <= diff; k++)
         {
-            today.erase(today.begin() + n);
+		// Stores index value of time object
+		 int n = -1;
+
+		 for (unsigned int i = 0; i < today.size(); i++)
+			{
+				int iStartHour = today.at(i)->getStartHour();
+				int iEndHour = today.at(i)->getEndHour();
+
+				tempStart =startHour+k-1;
+				tempEnd = startHour+k;
+
+				if ((tempStart == iStartHour) && (tempEnd == iEndHour))
+				{
+					n = i;
+				}
+			}
+			if (n != -1)
+			{
+				today.erase(today.begin() + n);
+			}
+			else
+			{
+				std::cout << "Start Hour: " << startHour << ", End Hour: " << endHour << " could not be deleted \n\n";
+				success = false;
+			}
         }
-        else
-        {
-            std::cout << "Start Hour: " << startHour << " End Hour: " << endHour << " could not be deleted \n\n";
-        }
+        if(success)
+        std::cout << "Start Hour: " << startHour << ", End Hour: " << endHour << " has been deleted \n\n";
     }
 
     std::vector<Time*> getTime()
@@ -173,8 +190,7 @@ public:
      */
     void insertTime()
     {
-    	std::cout <<"\n";
-        std::cout << "Insert a time? (0=No, 1=Yes): ";
+        std::cout << "Enter: 1 to insert time // 0 to return to menu ";
         int N;
         std::cin >> N;
 		bool error=true;
@@ -220,13 +236,16 @@ public:
 			while(startTime==endTime || startTime > endTime || timeExists(dayOfWeek,startTime,endTime))
 			{
 				std::cout<<"Time slot can not be inserted. Please try again. \n";
+				std::cout<<"\n";
+				dayOfWeek = this->dayOfWeek();
 				startTime = this->startTime();
 				endTime = this->endTime();
 			}
 
 			week[dayOfWeek - 1].insertTime(startTime, endTime);
 			std::cout<<"Time: "<<startTime<<"-"<<endTime<<" is now inserted. \n";
-			std::cout << "Insert a time? (0=No, 1=Yes): ";
+			std::cout<<"\n";
+			std::cout << "Enter: 1 to insert time // 0 to return to menu ";
 			std::cin >> N;
 			}
 		}
@@ -269,7 +288,15 @@ public:
     	int dayOfWeek = this->dayOfWeek();
 		int startTime = this->startTime();
 		int endTime = this->endTime();
-		week[dayOfWeek-1].deleteTime(startTime, endTime);
+
+		if(startTime==endTime || startTime > endTime || !timeExists(dayOfWeek,startTime,endTime))
+		{
+			std::cout<<"Time slot can not be deleted. \n";
+		}
+		else
+		{
+			week[dayOfWeek-1].deleteTime(startTime, endTime);
+		}
     }
 
     //Returns time vector in a given day of the week
@@ -288,7 +315,7 @@ public:
      */
     int dayOfWeek()
     {
-    	std::cout << "Day of Week (by number): ";
+    	std::cout << "Day of Week: ";
 		int dayOfWeek=0;
 		std::cin >> dayOfWeek;
 
@@ -381,6 +408,9 @@ public:
 				std::cout << "\n\n " << group.at(j)->getName() << " schedule is: ";
 				for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
 				{
+					//Comma formatting
+					if(k!=0)
+						std::cout << " , ";
 					std::cout << group.at(j)->getDay(i).at(k)->getStartHour() << "-";
 					while ((k+1) < group.at(j)->getDay(i).size() && group.at(j)->getDay(i).at(k)->getEndHour() == group.at(j)->getDay(i).at(k + 1)->getStartHour())
 					{
@@ -440,7 +470,7 @@ public:
 				if (timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
 				{
 					std::cout << timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
-						groupWeek[i].getTime().at(k)->getStartHour();
+					groupWeek[i].getTime().at(k)->getStartHour();
 
 					//ensures that the times printed out are contiguous
 					while ((k + 1) < groupWeek[i].getTime().size() && timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() && groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
@@ -466,13 +496,13 @@ scheduleManager()
 	while (input != 0)
 	{
 		std::cout<<"___________________________________________ \n";
-		std::cout << "Enter:\n'1' to create a new team member.\n"
-				"'2' to print member names.\n"
-				"'3' to delete a member.\n"
-				"'4' to print schedule.\n"
-				"'5' to edit / view a member's schedule.\n"
-				"'6' to print best times to meet.\n"
-				"'0' to end.\n"
+		std::cout << "Enter:\n1. to create a new team member.\n"
+				"2. to print member names.\n"
+				"3. to delete a member.\n"
+				"4. to print schedule.\n"
+				"5. to edit / view a member's schedule.\n"
+				"6. to print best times to meet.\n"
+				"0. to exit.\n"
 				"___________________________________________ \n"
 				"\nEnter menu option: ";
 
@@ -524,9 +554,9 @@ scheduleManager()
 				{
 					std::cout<<"Member already exists. Please try again. \n";
 				}
-				std::cout <<"Enter the first name of person to be added:\n";
+				std::cout <<"Enter the first name:\n";
 				std::cin >> firstName;
-				std::cout <<"Enter the last name of person to be added:\n";
+				std::cout <<"Enter the last name:\n";
 				 std::cin >> lastName;
 				std::cout<<"\n";
 
@@ -624,10 +654,11 @@ bool personExists(std::vector<Person*> group, std::string name)
 // Insert or delete times in person's saved schedule
 void editPerson(std::vector<Person*> group)
 {
-	  std::cout <<"Enter the first name of person to change schedule: \n";
+	  std::cout <<"Enter the first name: \n";
 	  std::string firstName; std::cin >> firstName;
-	  std::cout <<"Enter the last name of person to change schedule: \n";
+	  std::cout <<"Enter the last name: \n";
 	  std::string lastName; std::cin >> lastName;
+	  std::cout<<"\n";
 
 	  std::string name = firstName + " " + lastName;
 
@@ -646,6 +677,7 @@ void editPerson(std::vector<Person*> group)
 		if (n != -1)
 		{
 			int inputA = 1; //Input for sub-menu
+
 			/********* Sub-menu for Edit Person ***********
 			 * (1) inserting time
 			 * (2) deleting time
@@ -654,11 +686,12 @@ void editPerson(std::vector<Person*> group)
 			 */
 			while(inputA!=0)
 			{
-				std::cout <<"\n";
-				std::cout<<"Enter:\n'1' to insert a time.\n"
-							"'2' to delete a time.\n"
-							"'3' to print schedule.\n"
-							"'0' to return to the main menu.\n";
+				std::cout<<".......................................... \n";
+				std::cout<<"Enter:\n1. to insert a time.\n"
+							"2. to delete a time.\n"
+							"3. to print schedule.\n"
+							"0. to return to the main menu.\n";
+				std::cout<<".......................................... \n";
 				std::cin >> inputA;
 				switch(inputA)
 				{
@@ -670,23 +703,30 @@ void editPerson(std::vector<Person*> group)
 					break;
 				case 3:
 				{
+					std::cout<<"Option #3 - Print time has been selected. \n";
 					std::cout << "\n\n " << group.at(n)->getName() << "'s schedule is: ";
 					const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+					//Iterates through dayName array
 					for (int i = 0; i < 7; i++)
 					{
-						std::cout << "\n\nOn " << dayName[i]<<" " ; //Iterates through dayName array
+						std::cout << "\n\nOn " << dayName[i]<<" " ;
+
+						//Iterates through time vector in a day
 						for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
 						{
+							//Comma formatting
+							if(k!=0)
+								std::cout << " , ";
+
 							std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
+
 							//ensures that the times printed out are contiguous
 							while ((k+1) < group.at(n)->getDay(i).size() && group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
 							{
 								k++;
 							}
-
-							std::cout << group.at(n)->getDay(i).at(k)->getEndHour() << " , ";
+							std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
 							}
-
 					}
 				}
 				break;
@@ -704,6 +744,8 @@ void editPerson(std::vector<Person*> group)
 };
 int main()
 {
+	std::cout<<"\n";
+	std::cout<<"Welcome to Team Planner! \n";
 	scheduleManager start;
     return 0;
 }
