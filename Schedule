@@ -7,30 +7,82 @@
 #include <cstring>
 #include <sstream>
 
+/* Input Validation for menu options
+ * -Takes the range of the choices
+ */
+int inputValidation(int optionStart, int optionEnd)
+{
+	int inputA;
+	std::cin >> inputA;
+	bool error=true;
+
+	while(error)
+	{
+		//Catches string for int input
+		if(std::cin.fail())
+		{
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			std::cout<< "Invalid Input. Please enter a valid menu option: ";
+			std::cin >> inputA;
+		}
+
+		// Not within range
+		else if(inputA<optionStart && inputA>optionEnd)
+		{
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			std::cout<< "Invalid Input. Please enter a valid menu option: ";
+			std::cin >> inputA;
+		}
+
+		// Choice is valid
+		else if(inputA>=optionStart && inputA <= optionEnd)
+		{
+			error=false;
+		}
+
+		else
+		{
+			std::cin.clear();
+			std::cin.ignore(100, '\n');
+			std::cout<< "Invalid Input. Please enter a valid menu option: ";
+			std::cin >> inputA;
+		}
+	}
+
+	return inputA;
+}
+
 class Time
 {
 private:
     int startHour;
     int endHour;
+    //Represents the # of overlaps for a given time
     int timeoccurence;
 
 public:
-
     //Hours should be in military time
     Time(int startHour, int endHour)
     {
         this->startHour = startHour;
         this->endHour = endHour;
-	timeoccurence = 0;
+
+        timeoccurence = 0;
     }
+
+    //Used to get the ultimate schedule
     void incrimentTimeoccurence()
     {
         timeoccurence++;
     }
+
     int getTimeoccurence()
     {
         return timeoccurence;
     }
+
     int getStartHour()
     {
         return startHour;
@@ -51,9 +103,34 @@ private:
 
 public:
 
-	//Insert Time object based on startHour and endHour
+    //ensures that the times are sorted in order (least to greatest)
+	void sortTime(std::vector<Time*>& today, Time*& t)
+	{
+		bool inserted = false;
+
+		//Iterates through the vector to see if time fits anywhere in between
+		for (int j = 0; j < today.size(); j++)
+		{
+			it = today.begin();
+
+			if (t->getStartHour() < today.at(j)->getStartHour())
+			{
+				today.insert(it + j, t);
+				inserted = true;
+				break;
+			}
+		}
+
+		//Inserted is false if it is the last time in the given day
+		if (!inserted) today.push_back(t);
+	}
+
+/* Insert Time into a given day based on startHour and endHour
+ * -Each component added to the today vector will represent only 1 hour
+ */
 	void insertTime(int startHour, int endHour)
 	{
+		//If start hour and end hour do not represent 1 hour, it will be broken up into 1 hour segments
 		if (endHour - startHour != 1)
 		{
 			for (int i = startHour; i < endHour; i++)
@@ -64,7 +141,9 @@ public:
 					sortTime(today, t);
 				}
 				else
+				{
 					today.push_back(t);
+				}
 			}
 		}
 		else
@@ -75,30 +154,17 @@ public:
 				sortTime(today, t);
 			}
 			else
-				today.push_back(t);
-		}
-	}
-
-	//ensures that the times are sorted in order (least to greatest)
-	void sortTime(std::vector<Time*>& today, Time*& t)
-	{
-		bool inserted = false;
-		for (int j = 0; j < today.size(); j++)
-		{
-			it = today.begin();
-			if (t->getStartHour() < today.at(j)->getStartHour())
 			{
-				today.insert(it + j, t);
-				inserted = true;
-				break;
+				today.push_back(t);
 			}
 		}
-		if (!inserted) today.push_back(t);
 	}
 
+	//Determines the best times for the group to meet
     void insertTimeUltimateSchedule(int startHour, int endHour)
     {
         bool equalsTime = false;
+
         if (today.size() == 0)
         {
             Time* t = new Time(startHour, endHour);
@@ -106,6 +172,9 @@ public:
         }
         else
         {
+        	/* Iterates through the vector to see if time exists
+        	 * -If it exists then +1 to increment time occurrence
+        	 */
             for (int i = 0; i < today.size(); i++)
             {
                 if (today.at(i)->getStartHour() == startHour)
@@ -114,6 +183,7 @@ public:
                     equalsTime = true;
                 }
             }
+            //Time does not exist, create a new index with time
             if (!equalsTime)
             {
                 Time* t = new Time(startHour, endHour);
@@ -137,6 +207,7 @@ public:
 		// Stores index value of time object
 		 int n = -1;
 
+		 //Iterates through the times by hour to search for corresponding start hour and end hour
 		 for (unsigned int i = 0; i < today.size(); i++)
 			{
 				int iStartHour = today.at(i)->getStartHour();
@@ -150,6 +221,7 @@ public:
 					n = i;
 				}
 			}
+		 	//Time was found
 			if (n != -1)
 			{
 				today.erase(today.begin() + n);
@@ -160,8 +232,11 @@ public:
 				success = false;
 			}
         }
+
         if(success)
-        std::cout << "Start Hour: " << startHour << ", End Hour: " << endHour << " has been deleted \n\n";
+        {
+        	std::cout << "Start Hour: " << startHour << ", End Hour: " << endHour << " has been deleted \n\n";
+        }
     }
 
     std::vector<Time*> getTime()
@@ -175,9 +250,12 @@ class Person
 private:
     std::string firstName;
     std::string lastName;
+
     //Holds all the days and times for each week for a single person. Essentially, this is a person’s individual “schedule.”
     //Days are 1-7, starting from Sunday and ending with Saturday
     Day week[7];
+
+    //Saves time deletion and insertion changes
 	std::vector<std::string> history;
 
 public:
@@ -206,36 +284,8 @@ public:
     {
         std::cout << "Enter: 1 to insert time // 0 to return to menu ";
         int N;
-        std::cin >> N;
+        N = inputValidation(0,1);
 
-		bool error=true;
-		//Error check: input != int value
-		while(error)
-		{
-			if(std::cin.fail())
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> N;
-			}
-			else if(N<0 && N>1)
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> N;
-			}
-			else if(N==0 || N==1)
-				error=false;
-			else
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> N;
-			}
-	}
         while (N == 1)
 		  {
 			int dayOfWeek = this->dayOfWeek();
@@ -262,6 +312,7 @@ public:
 
 			std::stringstream add;
 			add << startTime << "-" << endTime << " added to schedule.";
+
 			std::string historyAdd = add.str();
 			history.push_back(historyAdd);
 
@@ -289,6 +340,7 @@ public:
 				}
     		}
     	}
+
     	//Iterates through all the end times in certain day
 		for(int i = beginTime+1; i<=endTime ; i++)
 		{
@@ -363,6 +415,7 @@ public:
 	  return dayOfWeek;
     }
 
+    //Used for assigned value to StartTime
     int startTime()
     {
     	 std::cout << "Start time: ";
@@ -387,6 +440,8 @@ public:
 		  }
 		  return startTime;
     }
+
+    //Used for assigned value to endTime
     int endTime()
     {
     	  std::cout << "End time: ";
@@ -420,27 +475,32 @@ public:
 
 class scheduleManager
 {
-
 public:
 	void outputSchedule(std::vector<Person*> group)
 	{
 		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 		for (int i = 0; i < 7; i++)
 		{
-			std::cout << "\n\nOn " << dayName[i] ; //Iterates through dayName array
+			std::cout << "\n\nOn " << dayName[i] ;
+
+			//Iterates through dayName array
 			for (int j = 0; j < group.size(); j++)
 			{
 				std::cout << "\n\n " << group.at(j)->getName() << " schedule is: ";
+
 				for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
 				{
 					//Comma formatting
 					if(k!=0)
 						std::cout << " , ";
 					std::cout << group.at(j)->getDay(i).at(k)->getStartHour() << "-";
-					while ((k+1) < group.at(j)->getDay(i).size() && group.at(j)->getDay(i).at(k)->getEndHour() == group.at(j)->getDay(i).at(k + 1)->getStartHour())
+
+					while ((k+1) < group.at(j)->getDay(i).size() &&
+							group.at(j)->getDay(i).at(k)->getEndHour() == group.at(j)->getDay(i).at(k + 1)->getStartHour())
 					{
 						k++;
 					}
+
 					std::cout << group.at(j)->getDay(i).at(k)->getEndHour() << " ";
 				}
 			}
@@ -499,7 +559,9 @@ public:
 					groupWeek[i].getTime().at(k)->getStartHour();
 
 					//ensures that the times printed out are contiguous
-					while ((k + 1) < groupWeek[i].getTime().size() && timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() && groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
+					while ((k + 1) < groupWeek[i].getTime().size() &&
+							timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() &&
+							groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
 					{
 						k++;
 					}
@@ -508,70 +570,72 @@ public:
 			}
 		}
 		std::cout<<"▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
-
 		std::cout << "\n";
 
 		if(!(group.empty()))
 		{
-				int inputA=1;
+			int inputA=1;
 
-				while(inputA!=0)
+			while(inputA!=0)
+			{
+				std::cout<<".......................................... \n";
+				std::cout<<"Enter:\n1. to view which members are available\n"
+							"0. to return to the main menu.\n";
+				std::cout<<".......................................... \n";
+				std::cout<<"\nEnter menu option: ";
+				inputA = inputValidation(0,1);
+
+				switch(inputA)
 				{
-					std::cout<<".......................................... \n";
-					std::cout<<"Enter:\n1. to view which members are available\n"
-								"0. to return to the main menu.\n";
-					std::cout<<".......................................... \n";
-					std::cout<<"\nEnter menu option: ";
-					std::cin >> inputA;
-					switch(inputA)
+				case 1:
+				{
+					std::cout << "Enter: 1 to view which members are available // 0 to return to menu ";
+					int viewMem =0;
+
+					//If user inputs string into choice
+					while(!(std::cin >> viewMem ))
 					{
-					case 1:
-					{
-						std::cout << "Enter: 1 to view which members are available // 0 to return to menu ";
-						int viewMem =0;
-
-						//If user inputs string into choice
-						while(!(std::cin >> viewMem ))
-						{
-							std::cin.clear();
-							std::cin.ignore(100,'\n');
-							std::cout << "Reenter valid input:  ";
-						}
-						std::cout << "\n";
-
-						//Lists members that are available at a given time
-						if(viewMem==1)
-						{
-							int dayOfWeek = group.at(0)->dayOfWeek();
-							int startHour = group.at(0)->startTime();
-							int endHour = group.at(0)->endTime();
-
-							//Iterates through group
-							std::cout << "The following members are available on "<< dayName[dayOfWeek]<< " from "<< startHour <<" - "<< endHour<<": \n";
-							int k = 0;
-							for(int i = 0; i<group.size();i++)
-							{
-								//Comma formatting
-								if(k!=0)
-									std::cout << " , ";
-								bool exists = group.at(i)->timeExists(dayOfWeek, startHour,endHour);
-								//If person has time in their schedule, their name is printed
-								if(exists)
-								{
-									std::cout << group.at(i)->getName();
-									std::cout << "\n";
-									++k;
-								}
-
-							}
+						std::cin.clear();
+						std::cin.ignore(100,'\n');
+						std::cout << "Reenter valid input:  ";
 					}
 					std::cout << "\n";
-					}
-					break;
-					default:
-					break;
-					}
+
+					//Lists members that are available at a given time
+					if(viewMem==1)
+					{
+						int dayOfWeek = group.at(0)->dayOfWeek();
+						int startHour = group.at(0)->startTime();
+						int endHour = group.at(0)->endTime();
+
+						//Iterates through group
+						std::cout << "The following members are available on "<< dayName[dayOfWeek]<< " from "
+						<< startHour <<" - "<< endHour<<": \n";
+
+						int k = 0;
+						for(int i = 0; i<group.size();i++)
+						{
+							//Comma formatting
+							if(k!=0)
+								std::cout << " , ";
+							bool exists = group.at(i)->timeExists(dayOfWeek, startHour,endHour);
+							//If person has time in their schedule, their name is printed
+							if(exists)
+							{
+								std::cout << group.at(i)->getName();
+								std::cout << "\n";
+								++k;
+							}
+
+						}
 				}
+				std::cout << "\n";
+				}
+				break;
+				default:
+				break;
+				}
+			}
 		}
 	}
 
@@ -599,35 +663,8 @@ scheduleManager()
 				"Enter menu option: ";
 
 		//Ensures input is an int
-		bool error=true;
-		std::cin >> input;
-		while(error)
-		{
-			if(std::cin.fail())
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> input;
-			}
-			else if(input<0&&input>7)
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> input;
-			}
-			else if(input==0 || input==1 || input==2 || input==3 || input==4 || input==5 || input==6 || input==7)
-				error=false;
-			else
-			{
-				std::cin.clear();
-				std::cin.ignore(100, '\n');
-				std::cout<< "Invalid Input. Please enter a valid menu option: ";
-				std::cin >> input;
-			}
-		}
-		switch (input)
+		input = inputValidation(0,7);
+				switch (input)
 		{
 			//Insert new team member
 			case 1:
@@ -646,43 +683,19 @@ scheduleManager()
 						std::cout<<"Error, member already exists. \n";
 						break;
 					}
-					int makesure=0;
+
+					int makesure = 0;
 					while(makesure != 1)
 					{
 						std::cout <<"Enter first and last name:\n";
 						std::cin >> firstName;
 						std::cin >> lastName;
+						std::cout<<"\n";
+
 						name = firstName + " " + lastName;
 
-						std::cout<< "Is " << name << " correct? (1=Yes, 0=No): ";
-
-						std::cin >> makesure;
-						while(error)
-						{
-							if(std::cin.fail())
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-							else if(makesure<0 && makesure>1)
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-							else if(makesure==0 || makesure==1)
-								error=false;
-							else
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-						}
+						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+						makesure = inputValidation(0,1);
 					}
 				std::cout<<"\n";
 				name = firstName + " " + lastName;
@@ -696,60 +709,36 @@ scheduleManager()
 				}
 			}
 				break;
+
 			//Print names of team members
 			case 2:
 			{
 				for (int i = 0; i < group.size(); i++)
+				{
 					std::cout << group.at(i)->getName() << "\n";
+				}
 				std::cout << "\n";
 			}
 				break;
+
 			//Delete person from group
 			case 3:
 				{
-					int makesure=0;
+					int makesure = 0;
 					std::string name;
+
 					while(makesure != 1)
 					{
 						std::cout <<"Enter first and last name:\n";
 						std::string firstName;
 						std::cin >> firstName;
-
 						std::string lastName;
 						std::cin >> lastName;
 						std::cout<<"/n";
-
 						name = firstName + " " + lastName;
-						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
-						bool error=true;
-						std::cin >> makesure;
 
-						while(error)
-						{
-							if(std::cin.fail())
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-							else if(makesure<0 && makesure>1)
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-							else if(makesure==0 || makesure==1)
-								error=false;
-							else
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> makesure;
-							}
-						}
+						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+						makesure = inputValidation(0,1);
 					}
 				}
 				break;
@@ -760,53 +749,30 @@ scheduleManager()
 				outputSchedule(group);
 			}
 				break;
+
 			// Edit schedule
 			case 5:
 			{
 				editPerson(group);
 			}
 				break;
+
 			//Print best times
 			case 6:
 			{
 				ultimateSchedule(group);
 			}
 				break;
+
 			//Print history
 			case 7:
 			{
 				int choice;
 				std::cout<< "History for whole group or one member? (0=One, 1=Whole): ";
-				std::cin>> choice;
-				bool error=true;
-				while(error)
-				{
-					if(std::cin.fail())
-					{
-						std::cin.clear();
-						std::cin.ignore(100, '\n');
-						std::cout<< "Invalid Input. Please enter a valid menu option: ";
-						std::cin >> choice;
-					}
-					else if(choice<0 && choice>1)
-					{
-						std::cin.clear();
-						std::cin.ignore(100, '\n');
-						std::cout<< "Invalid Input. Please enter a valid menu option: ";
-						std::cin >> choice;
-					}
-					else if(choice==0 || choice==1)
-						error=false;
-					else
-					{
-						std::cin.clear();
-						std::cin.ignore(100, '\n');
-						std::cout<< "Invalid Input. Please enter a valid menu option: ";
-						std::cin >> choice;
-					}
-				}
+				choice = inputValidation(0,1);
 				switch(choice)
 				{
+					//Print history for 1 member
 					case 1:
 					{
 						for(int i=0; i < group.size(); i++)
@@ -815,13 +781,14 @@ scheduleManager()
 						}
 					}
 					break;
+
+					//Print history for whole group
 					case 0:
 					{
 						std::string name;
-						std::cout <<"Enter first and last name:\n";
+						std::cout <<"Enter first and last name: \n";
 						std::string firstName;
 						std::cin >> firstName;
-
 						std::string lastName;
 						std::cin >> lastName;
 						name = firstName + " " + lastName;
@@ -836,10 +803,10 @@ scheduleManager()
 								n = i;
 							}
 						}
+
 						if (n != -1)
 						{
 							group.at(n)->printHistory();
-
 						}
 						else
 						{
@@ -850,6 +817,7 @@ scheduleManager()
 				}
 			}
 			break;
+
 			default:
 				break;
 		}
@@ -866,6 +834,7 @@ bool personExists(std::vector<Person*> group, std::string name)
 		{
 			std::string pName = group.at(i)->getName();
 			//bool is true when name is found in group
+
 			if (pName == name)
 			{
 				exists = true;
@@ -877,126 +846,104 @@ bool personExists(std::vector<Person*> group, std::string name)
 // Insert or delete times in person's saved schedule
 void editPerson(std::vector<Person*> group)
 {
-	  std::cout <<"Enter first and last name:\n";
-	  std::string firstName; std::cin >> firstName;
-	  std::string lastName; std::cin >> lastName;
-	  std::cout<<"\n";
+  std::cout <<"Enter first and last name: \n";
+  std::string firstName; std::cin >> firstName;
+  std::string lastName; std::cin >> lastName;
+  std::cout<<"\n";
 
-	  std::string name = firstName + " " + lastName;
+  std::string name = firstName + " " + lastName;
 
-		int n = -1; // Stores index value of person in group
+	int n = -1; // Stores index value of person in group
 
-		//Iterates through group vector, sets n to the index belonging to given person
-		for (unsigned int i = 0; i < group.size(); i++)
+	//Iterates through group vector, sets n to the index belonging to given person
+	for (unsigned int i = 0; i < group.size(); i++)
+	{
+		std::string pName = group.at(i)->getName();
+		if (pName == name)
 		{
-			std::string pName = group.at(i)->getName();
-			if (pName == name)
-			{
-				n = i;
-			}
+			n = i;
 		}
-		//n!=-1 when person exists in the group vector
-		if (n != -1)
+	}
+	//n!=-1 when person exists in the group vector
+	if (n != -1)
+	{
+		int inputA = 1; //Input for sub-menu
+
+		/********* Sub-menu for Edit Person ***********
+		 * (1) inserting time
+		 * (2) deleting time
+		 * (3) print schedule
+		 * (0) return to main menu
+		 */
+		while(inputA!=0)
 		{
-			int inputA = 1; //Input for sub-menu
-
-			/********* Sub-menu for Edit Person ***********
-			 * (1) inserting time
-			 * (2) deleting time
-			 * (3) print schedule
-			 * (0) return to main menu
-			 */
-			while(inputA!=0)
+			std::cout<<".......................................... \n";
+			std::cout<<"Enter:\n1. to insert a time.\n"
+						"2. to delete a time.\n"
+						"3. to print schedule.\n"
+						"0. to return to the main menu.\n";
+			std::cout<<".......................................... \n";
+			std::cout<<"\nEnter menu option: ";
+			inputA = inputValidation(0,3);
+			switch(inputA)
 			{
-				std::cout<<".......................................... \n";
-				std::cout<<"Enter:\n1. to insert a time.\n"
-							"2. to delete a time.\n"
-							"3. to print schedule.\n"
-							"0. to return to the main menu.\n";
-				std::cout<<".......................................... \n";
-				std::cout<<"\nEnter menu option: ";
-				std::cin >> inputA;
-				bool error=true;
+			case 1: //INSERT NEW TIME
+				group.at(n)->insertTime();
+				break;
+			case 2: //DELETE SAVED TIME
+				group.at(n)->deleteTime();
+				break;
+			case 3:
+			{
+				std::cout << group.at(n)->getName() << "'s schedule is: ";
+				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+				//Iterates through dayName array
+				for (int i = 0; i < 7; i++)
+				{
+					std::cout << "\n\nOn " << dayName[i]<<" " ;
 
-						while(error)
-						{
-							if(std::cin.fail())
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> inputA;
-							}
-							else if(inputA<0 && inputA>1)
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> inputA;
-							}
-							else if(inputA==3 || inputA==1 || inputA == 2)
-								error=false;
-							else
-							{
-								std::cin.clear();
-								std::cin.ignore(100, '\n');
-								std::cout<< "Invalid Input. Please enter a valid menu option: ";
-								std::cin >> inputA;
-							}
-						}
-				switch(inputA)
-				{
-				case 1: //INSERT NEW TIME
-					group.at(n)->insertTime();
-					break;
-				case 2: //DELETE SAVED TIME
-					group.at(n)->deleteTime();
-					break;
-				case 3:
-				{
-					std::cout << group.at(n)->getName() << "'s schedule is: ";
-					const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-					//Iterates through dayName array
-					for (int i = 0; i < 7; i++)
+					//Iterates through time vector in a day
+					for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
 					{
-						std::cout << "\n\nOn " << dayName[i]<<" " ;
+						//Comma formatting
+						if(k!=0)
+							std::cout << " , ";
 
-						//Iterates through time vector in a day
-						for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
+						std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
+
+						//ensures that the times printed out are contiguous
+						while ((k+1) < group.at(n)->getDay(i).size() &&
+								group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
 						{
-							//Comma formatting
-							if(k!=0)
-								std::cout << " , ";
-
-							std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
-
-							//ensures that the times printed out are contiguous
-							while ((k+1) < group.at(n)->getDay(i).size() && group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
-							{
-								k++;
-							}
-							std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
-							}
-					}
-					std::cout << "\n";
+							k++;
+						}
+						std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
+						}
 				}
-				break;
-				default:
-				break;
-				}
+				std::cout << "\n";
+			}
+			break;
+
+			default:
+			break;
 			}
 		}
-		//n=-1 indicates person was not found
-		else
-		{
-			std::cout << name << " does not exist!\n\n";
-		}
+	}
+	//n=-1 indicates person was not found
+	else
+	{
+		std::cout << name << " does not exist!\n\n";
+	}
 }
 };
 int main()
 {
 	std::cout<<"\n";
-	std::cout<<"Welcome to Team Planner! \n";
+	std::cout<<"Welcome to Team Planner! \n \n";
+	std::cout<<"Please note the following: \n";
+	std::cout<<"1. Start hour and end hour in  military time. \n";
+	std::cout<<"2. Monday through Sunday are represented by the number 1 through 7, respectively. \n";
+
 	scheduleManager start;
     return 0;
 }
