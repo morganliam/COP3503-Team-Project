@@ -21,7 +21,7 @@ public:
     {
         this->startHour = startHour;
         this->endHour = endHour;
-		timeoccurence = 0;
+	timeoccurence = 0;
     }
     void incrimentTimeoccurence()
     {
@@ -207,6 +207,7 @@ public:
         std::cout << "Enter: 1 to insert time // 0 to return to menu ";
         int N;
         std::cin >> N;
+
 		bool error=true;
 		//Error check: input != int value
 		while(error)
@@ -533,7 +534,7 @@ public:
 						while(!(std::cin >> viewMem ))
 						{
 							std::cin.clear();
-							std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+							std::cin.ignore(100,'\n');
 							std::cout << "Reenter valid input:  ";
 						}
 						std::cout << "\n";
@@ -652,11 +653,9 @@ scheduleManager()
 						std::cin >> firstName;
 						std::cout <<"Enter the last name:\n";
 						std::cin >> lastName;
-						std::cout<<"\n";
-
 						name = firstName + " " + lastName;
 
-						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+						std::cout<< "Is " << name << " correct? (1=Yes, 0=No): ";
 
 						std::cin >> makesure;
 						while(error)
@@ -918,6 +917,34 @@ void editPerson(std::vector<Person*> group)
 				std::cout<<".......................................... \n";
 				std::cout<<"\nEnter menu option: ";
 				std::cin >> inputA;
+				bool error=true;
+
+						while(error)
+						{
+							if(std::cin.fail())
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> inputA;
+							}
+							else if(inputA<0 && inputA>1)
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> inputA;
+							}
+							else if(inputA==3 || inputA==1 || inputA == 2)
+								error=false;
+							else
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> inputA;
+							}
+						}
 				switch(inputA)
 				{
 				case 1: //INSERT NEW TIME
