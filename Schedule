@@ -734,7 +734,7 @@ scheduleManager()
 						std::cin >> firstName;
 						std::string lastName;
 						std::cin >> lastName;
-						std::cout<<"/n";
+						std::cout<<"\n";
 						name = firstName + " " + lastName;
 
 						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
