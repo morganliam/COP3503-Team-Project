@@ -507,6 +507,36 @@ public:
 		}
 		std::cout << "\n\n";
 	}
+	
+	void outputDaySchedule(std::vector<Person*> group, int day)
+	{
+		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+			std::cout << "\n\nOn " << dayName[day] ;
+
+			//Iterates through dayName array
+			for (int j = 0; j < group.size(); j++)
+			{
+				std::cout << "\n\n " << group.at(j)->getName() << " schedule is: ";
+
+				for (int k = 0; k < group.at(j)->getDay(day).size(); k++)
+				{
+					//Comma formatting
+					if(k!=0)
+						std::cout << " , ";
+					std::cout << group.at(j)->getDay(day).at(k)->getStartHour() << "-";
+
+					while ((k+1) < group.at(j)->getDay(day).size() &&
+							group.at(j)->getDay(day).at(k)->getEndHour() == group.at(j)->getDay(day).at(k + 1)->getStartHour())
+					{
+						k++;
+					}
+
+					std::cout << group.at(j)->getDay(day).at(k)->getEndHour() << " ";
+				}
+			}
+		std::cout << "\n\n";
+	}
+
 
 	//Determines the best possible time for the group to meet
 	//(determines the day and times with the most overlapping time occurrences)
@@ -733,11 +763,34 @@ scheduleManager()
 				break;
 
 			//Print every individual schedule
-			case 4:
+		case 4:
 			{
-				outputSchedule(group);
+				std::cout<< "..........................................\n"
+					"Enter:\n"
+					"'1' for single day schedule.\n"
+					"'2' for whole week schedule.\n"
+					"'0' to return to main menu.\n"
+					"..........................................\n\n"
+					"Enter menu option: ";
+				int choice = inputValidation(0,2);
+				switch(choice)
+				{
+					case 1:
+					{
+						std::cout << "Enter a day: ";
+						int day = inputValidation(1,7);
+						outputDaySchedule(group, day-1);
+					}
+					break;
+					case 2:
+					{
+						outputSchedule(group);
+					}
+					break;
+				}
 			}
-				break;
+			break;
+
 
 			// Edit schedule
 			case 5:
