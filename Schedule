@@ -2,6 +2,10 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <stdexcept>
+#include <cstdlib>
+#include <cstring>
+#include <sstream>
 
 class Time
 {
@@ -174,6 +178,7 @@ private:
     //Holds all the days and times for each week for a single person. Essentially, this is a person’s individual “schedule.”
     //Days are 1-7, starting from Sunday and ending with Saturday
     Day week[7];
+	std::vector<std::string> history;
 
 public:
     Person(std::string firstName, std::string lastName)
@@ -183,6 +188,15 @@ public:
         //Prompts user to insert time if desired
         insertTime();
     }
+
+	void printHistory()
+	{
+		std::cout<< "History for " << firstName << " " << lastName << ": \n";
+		for(int i=0; i < history.size(); i++)
+		{
+			std::cout << "     " << history.at(i) << "\n";
+		}
+	}
 
     /* Time insertion menu
      * -0 return to menu
@@ -244,6 +258,12 @@ public:
 
 			week[dayOfWeek - 1].insertTime(startTime, endTime);
 			std::cout<<"Time: "<<startTime<<"-"<<endTime<<" is now inserted. \n";
+
+			std::stringstream add;
+			add << startTime << "-" << endTime << " added to schedule.";
+			std::string historyAdd = add.str();
+			history.push_back(historyAdd);
+
 			std::cout<<"\n";
 			std::cout << "Enter: 1 to insert time // 0 to return to menu ";
 			std::cin >> N;
@@ -295,6 +315,11 @@ public:
 		else
 		{
 			week[dayOfWeek-1].deleteTime(startTime, endTime);
+
+			std::stringstream add;
+			add << startTime << "-" << endTime << " deleted from schedule.";
+			std::string historyAdd = add.str();
+			history.push_back(historyAdd);
 		}
     }
 
@@ -373,7 +398,6 @@ public:
 			if(endTime>0 && endTime<25)
 			{
 			  notValide = false;
-
 			}
 			else
 			{
@@ -395,6 +419,7 @@ public:
 
 class scheduleManager
 {
+
 public:
 	void outputSchedule(std::vector<Person*> group)
 	{
@@ -460,6 +485,7 @@ public:
 		}
 
 		//outputs the best time to meet
+		std::cout<<"▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
 		std::cout << "The best time for the group to meet is:\n\n";
 		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 		for (int i = 0; i < 7; i++)
@@ -468,7 +494,7 @@ public:
 			{
 				if (timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
 				{
-					std::cout << timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
+					std::cout << "◦ "<<timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
 					groupWeek[i].getTime().at(k)->getStartHour();
 
 					//ensures that the times printed out are contiguous
@@ -476,10 +502,75 @@ public:
 					{
 						k++;
 					}
-
 					std::cout << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
 				}
 			}
+		}
+		std::cout<<"▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
+
+		std::cout << "\n";
+
+		if(!(group.empty()))
+		{
+				int inputA=1;
+
+				while(inputA!=0)
+				{
+					std::cout<<".......................................... \n";
+					std::cout<<"Enter:\n1. to view which members are available\n"
+								"0. to return to the main menu.\n";
+					std::cout<<".......................................... \n";
+					std::cout<<"\nEnter menu option: ";
+					std::cin >> inputA;
+					switch(inputA)
+					{
+					case 1:
+					{
+						std::cout << "Enter: 1 to view which members are available // 0 to return to menu ";
+						int viewMem =0;
+
+						//If user inputs string into choice
+						while(!(std::cin >> viewMem ))
+						{
+							std::cin.clear();
+							std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
+							std::cout << "Reenter valid input:  ";
+						}
+						std::cout << "\n";
+
+						//Lists members that are available at a given time
+						if(viewMem==1)
+						{
+							int dayOfWeek = group.at(0)->dayOfWeek();
+							int startHour = group.at(0)->startTime();
+							int endHour = group.at(0)->endTime();
+
+							//Iterates through group
+							std::cout << "The following members are available on "<< dayName[dayOfWeek]<< " from "<< startHour <<" - "<< endHour<<": \n";
+							int k = 0;
+							for(int i = 0; i<group.size();i++)
+							{
+								//Comma formatting
+								if(k!=0)
+									std::cout << " , ";
+								bool exists = group.at(i)->timeExists(dayOfWeek, startHour,endHour);
+								//If person has time in their schedule, their name is printed
+								if(exists)
+								{
+									std::cout << group.at(i)->getName();
+									std::cout << "\n";
+									++k;
+								}
+
+							}
+					}
+					std::cout << "\n";
+					}
+					break;
+					default:
+					break;
+					}
+				}
 		}
 	}
 
@@ -501,9 +592,10 @@ scheduleManager()
 				"4. to print schedule.\n"
 				"5. to edit / view a member's schedule.\n"
 				"6. to print best times to meet.\n"
-				"0. to exit.\n"
-				"___________________________________________ \n"
-				"\nEnter menu option: ";
+				"7. to print history.\n"
+				"0. to end.\n"
+				"___________________________________________ \n\n"
+				"Enter menu option: ";
 
 		//Ensures input is an int
 		bool error=true;
@@ -517,16 +609,15 @@ scheduleManager()
 				std::cout<< "Invalid Input. Please enter a valid menu option: ";
 				std::cin >> input;
 			}
-			else if(input<0&&input>6)
+			else if(input<0&&input>7)
 			{
-			std::cin.clear();
+				std::cin.clear();
 				std::cin.ignore(100, '\n');
 				std::cout<< "Invalid Input. Please enter a valid menu option: ";
 				std::cin >> input;
 			}
-			else if(input==0 || input==1 || input==2 || input==3 || input==4 || input==5 || input==6)
-			error=false;
-
+			else if(input==0 || input==1 || input==2 || input==3 || input==4 || input==5 || input==6 || input==7)
+				error=false;
 			else
 			{
 				std::cin.clear();
@@ -535,7 +626,6 @@ scheduleManager()
 				std::cin >> input;
 			}
 		}
-
 		switch (input)
 		{
 			//Insert new team member
@@ -547,25 +637,65 @@ scheduleManager()
 				int n = 0;
 
 				//do while loop used to check name does not already exists
-				do{
-				++n;
-				if(n>1)
+				do
 				{
-					std::cout<<"Member already exists. Please try again. \n";
-				}
-				std::cout <<"Enter the first name:\n";
-				std::cin >> firstName;
-				std::cout <<"Enter the last name:\n";
-				 std::cin >> lastName;
-				std::cout<<"\n";
+					++n;
+					if(personExists(group,name))
+					{
+						std::cout<<"Error, member already exists. \n";
+						break;
+					}
+					int makesure=0;
+					while(makesure != 1)
+					{
+						std::cout <<"Enter the first name:\n";
+						std::cin >> firstName;
+						std::cout <<"Enter the last name:\n";
+						std::cin >> lastName;
+						std::cout<<"\n";
 
+						name = firstName + " " + lastName;
+
+						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+
+						std::cin >> makesure;
+						while(error)
+						{
+							if(std::cin.fail())
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure<0 && makesure>1)
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure==0 || makesure==1)
+								error=false;
+							else
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+						}
+					}
+				std::cout<<"\n";
 				name = firstName + " " + lastName;
 				}
 				while(personExists(group,name));
 
-				//name was not found, new member can be created
-				Person* p = new Person(firstName, lastName);
-				group.push_back(p);
+				if(!personExists(group,name))
+				{
+					Person* p = new Person(firstName, lastName);
+					group.push_back(p);
+				}
 			}
 				break;
 			//Print names of team members
@@ -573,41 +703,58 @@ scheduleManager()
 			{
 				for (int i = 0; i < group.size(); i++)
 					std::cout << group.at(i)->getName() << "\n";
-				std::cout << "\n\n";
+				std::cout << "\n";
 			}
 				break;
 			//Delete person from group
 			case 3:
 				{
-					  std::cout <<"Enter the first name of person to be removed:\n";
-					  std::string firstName; std::cin >> firstName;
-					  std::cout <<"Enter the last name of person to be removed:\n";
-					  std::string lastName; std::cin >> lastName;
-
-					  std::string name = firstName + " " + lastName;
-					  // Stores index value of person in group
-					int n = -1;
-
-					for (unsigned int i = 0; i < group.size(); i++)
+					int makesure=0;
+					std::string name;
+					while(makesure != 1)
 					{
-						std::string pName = group.at(i)->getName();
-						if (pName == name)
+						std::cout <<"Enter the first name of person to be removed:\n";
+						std::string firstName;
+						std::cin >> firstName;
+						std::cout <<"Enter the last name of person to be removed:\n";
+						std::string lastName;
+						std::cin >> lastName;
+						std::cout<<"/n";
+						name = firstName + " " + lastName;
+						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+						bool error=true;
+						std::cin >> makesure;
+
+						while(error)
 						{
-							n = i;
+							if(std::cin.fail())
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure<0 && makesure>1)
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
+							else if(makesure==0 || makesure==1)
+								error=false;
+							else
+							{
+								std::cin.clear();
+								std::cin.ignore(100, '\n');
+								std::cout<< "Invalid Input. Please enter a valid menu option: ";
+								std::cin >> makesure;
+							}
 						}
-					}
-					if (n != -1)
-					{
-						std::string dName = group.at(n)->getName();
-						std::cout<<dName<<" was removed. \n";
-						group.erase(group.begin() + n);
-					}
-					else
-					{
-						std::cout << name << " does not exist!\n\n";
 					}
 				}
 				break;
+
 			//Print every individual schedule
 			case 4:
 			{
@@ -626,6 +773,84 @@ scheduleManager()
 				ultimateSchedule(group);
 			}
 				break;
+			//Print history
+			case 7:
+			{
+				int choice;
+				std::cout<< "History for whole group or one member? (0=One, 1=Whole): ";
+				std::cin>> choice;
+				bool error=true;
+				while(error)
+				{
+					if(std::cin.fail())
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> choice;
+					}
+					else if(choice<0 && choice>1)
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> choice;
+					}
+					else if(choice==0 || choice==1)
+						error=false;
+					else
+					{
+						std::cin.clear();
+						std::cin.ignore(100, '\n');
+						std::cout<< "Invalid Input. Please enter a valid menu option: ";
+						std::cin >> choice;
+					}
+				}
+				switch(choice)
+				{
+					case 1:
+					{
+						for(int i=0; i < group.size(); i++)
+						{
+							group.at(i)->printHistory();
+						}
+					}
+					break;
+					case 0:
+					{
+						std::string name;
+							std::cout <<"Enter the first name of person to show history:\n";
+							std::string firstName;
+							std::cin >> firstName;
+							std::cout <<"Enter the last name of person to show history:\n";
+							std::string lastName;
+							std::cin >> lastName;
+							name = firstName + " " + lastName;
+
+						int n = -1; // Stores index value of person in group
+
+						for (unsigned int i = 0; i < group.size(); i++)
+						{
+							std::string pName = group.at(i)->getName();
+							if (pName == name)
+							{
+								n = i;
+							}
+						}
+						if (n != -1)
+						{
+							group.at(n)->printHistory();
+
+						}
+						else
+						{
+							std::cout << name << " does not exist!\n\n";
+						}
+					}
+					break;
+				}
+			}
+			break;
 			default:
 				break;
 		}
@@ -728,7 +953,6 @@ void editPerson(std::vector<Person*> group)
 							}
 					}
 					std::cout << "\n";
-
 				}
 				break;
 				default:
