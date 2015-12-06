@@ -649,9 +649,8 @@ scheduleManager()
 					int makesure=0;
 					while(makesure != 1)
 					{
-						std::cout <<"Enter the first name:\n";
+						std::cout <<"Enter first and last name:\n";
 						std::cin >> firstName;
-						std::cout <<"Enter the last name:\n";
 						std::cin >> lastName;
 						name = firstName + " " + lastName;
 
@@ -712,13 +711,14 @@ scheduleManager()
 					std::string name;
 					while(makesure != 1)
 					{
-						std::cout <<"Enter the first name of person to be removed:\n";
+						std::cout <<"Enter first and last name:\n";
 						std::string firstName;
 						std::cin >> firstName;
-						std::cout <<"Enter the last name of person to be removed:\n";
+
 						std::string lastName;
 						std::cin >> lastName;
 						std::cout<<"/n";
+
 						name = firstName + " " + lastName;
 						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
 						bool error=true;
@@ -818,13 +818,13 @@ scheduleManager()
 					case 0:
 					{
 						std::string name;
-							std::cout <<"Enter the first name of person to show history:\n";
-							std::string firstName;
-							std::cin >> firstName;
-							std::cout <<"Enter the last name of person to show history:\n";
-							std::string lastName;
-							std::cin >> lastName;
-							name = firstName + " " + lastName;
+						std::cout <<"Enter first and last name:\n";
+						std::string firstName;
+						std::cin >> firstName;
+
+						std::string lastName;
+						std::cin >> lastName;
+						name = firstName + " " + lastName;
 
 						int n = -1; // Stores index value of person in group
 
@@ -877,9 +877,8 @@ bool personExists(std::vector<Person*> group, std::string name)
 // Insert or delete times in person's saved schedule
 void editPerson(std::vector<Person*> group)
 {
-	  std::cout <<"Enter the first name: \n";
+	  std::cout <<"Enter first and last name:\n";
 	  std::string firstName; std::cin >> firstName;
-	  std::cout <<"Enter the last name: \n";
 	  std::string lastName; std::cin >> lastName;
 	  std::cout<<"\n";
 
