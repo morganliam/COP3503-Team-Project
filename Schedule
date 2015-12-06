@@ -284,7 +284,6 @@ public:
     //Calls deleteTime method in Day field
     void deleteTime()
     {
-    	std::cout<<"Option #2 - Delete time has been selected. \n";
     	int dayOfWeek = this->dayOfWeek();
 		int startTime = this->startTime();
 		int endTime = this->endTime();
@@ -692,6 +691,7 @@ void editPerson(std::vector<Person*> group)
 							"3. to print schedule.\n"
 							"0. to return to the main menu.\n";
 				std::cout<<".......................................... \n";
+				std::cout<<"\nEnter menu option: ";
 				std::cin >> inputA;
 				switch(inputA)
 				{
@@ -703,8 +703,7 @@ void editPerson(std::vector<Person*> group)
 					break;
 				case 3:
 				{
-					std::cout<<"Option #3 - Print time has been selected. \n";
-					std::cout << "\n\n " << group.at(n)->getName() << "'s schedule is: ";
+					std::cout << group.at(n)->getName() << "'s schedule is: ";
 					const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 					//Iterates through dayName array
 					for (int i = 0; i < 7; i++)
@@ -728,6 +727,8 @@ void editPerson(std::vector<Person*> group)
 							std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
 							}
 					}
+					std::cout << "\n";
+
 				}
 				break;
 				default:
