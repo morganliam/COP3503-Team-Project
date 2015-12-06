@@ -740,6 +740,26 @@ scheduleManager()
 						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
 						makesure = inputValidation(0,1);
 					}
+					int n = -1; // Stores index value of person in group
+
+						for (unsigned int i = 0; i < group.size(); i++)
+						{
+							std::string pName = group.at(i)->getName();
+							if (pName == name)
+							{
+								n = i;
+							}
+						}
+						if (n != -1)
+						{
+							std::string dName = group.at(n)->getName();
+							std::cout<<dName<<" was removed. \n";
+							group.erase(group.begin() + n);
+						}
+						else
+						{
+							std::cout << name << " does not exist!\n\n";
+						}
 				}
 				break;
 
