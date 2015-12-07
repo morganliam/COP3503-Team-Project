@@ -530,64 +530,6 @@ std::cout <<"Enter first and last name: \n";
 
 }
 
-void printAllDays(std::vector<Person*> group)
-{
-	std::cout <<"Enter first and last name: \n";
-  std::string firstName; std::cin >> firstName;
-  std::string lastName; std::cin >> lastName;
-  std::cout<<"\n";
-
-  std::string name = firstName + " " + lastName;
-
-	int n = -1; // Stores index value of person in group
-
-	//Iterates through group vector, sets n to the index belonging to given person
-	for (unsigned int i = 0; i < group.size(); i++)
-	{
-		std::string pName = group.at(i)->getName();
-		if (pName == name)
-		{
-			n = i;
-		}
-	}
-	//n!=-1 when person exists in the group vector
-	if (n != -1)
-	{
-				std::cout << group.at(n)->getName() << "'s schedule is: ";
-				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-				//Iterates through dayName array
-				for (int i = 0; i < 7; i++)
-				{
-					std::cout << "\n\nOn " << dayName[i]<<" " ;
-
-					//Iterates through time vector in a day
-					for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
-					{
-						//Comma formatting
-						if(k!=0)
-							std::cout << " , ";
-
-						std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
-
-						//ensures that the times printed out are contiguous
-						while ((k+1) < group.at(n)->getDay(i).size() &&
-								group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
-						{
-							k++;
-						}
-						std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
-						}
-				}
-				std::cout << "\n";
-	}
-	//n=-1 indicates person was not found
-	else
-	{
-		std::cout << name << " does not exist!\n\n";
-	}
-
-}
-
 class scheduleManager
 {
 public:
@@ -622,7 +564,7 @@ public:
 		}
 		std::cout << "\n\n";
 	}
-	
+
 	void outputDaySchedule(std::vector<Person*> group, int day)
 	{
 		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
@@ -650,6 +592,63 @@ public:
 				}
 			}
 		std::cout << "\n\n";
+	}
+
+	void printAllDays(std::vector<Person*> group)
+	{
+	  std::cout <<"Enter first and last name: \n";
+	  std::string firstName; std::cin >> firstName;
+	  std::string lastName; std::cin >> lastName;
+	  std::cout<<"\n";
+
+	  std::string name = firstName + " " + lastName;
+
+		int n = -1; // Stores index value of person in group
+
+		//Iterates through group vector, sets n to the index belonging to given person
+		for (unsigned int i = 0; i < group.size(); i++)
+		{
+			std::string pName = group.at(i)->getName();
+			if (pName == name)
+			{
+				n = i;
+			}
+		}
+		//n!=-1 when person exists in the group vector
+		if (n != -1)
+		{
+			std::cout << group.at(n)->getName() << "'s schedule is: ";
+			const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+			//Iterates through dayName array
+			for (int i = 0; i < 7; i++)
+			{
+				std::cout << "\n\nOn " << dayName[i]<<" " ;
+
+				//Iterates through time vector in a day
+				for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
+				{
+					//Comma formatting
+					if(k!=0)
+						std::cout << " , ";
+
+					std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
+
+					//ensures that the times printed out are contiguous
+					while ((k+1) < group.at(n)->getDay(i).size() &&
+							group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
+					{
+						k++;
+					}
+					std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
+					}
+			}
+			std::cout << "\n";
+		}
+		//n=-1 indicates person was not found
+		else
+		{
+			std::cout << name << " does not exist!\n\n";
+		}
 	}
 
 
@@ -798,7 +797,7 @@ scheduleManager()
 
 		//Ensures input is an int
 		input = inputValidation(0,7);
-				switch (input)
+		switch (input)
 		{
 			//Insert new team member
 			case 1:
@@ -857,63 +856,74 @@ scheduleManager()
 
 			//Delete person from group
 			case 3:
+			{
+				int makesure = 0;
+				std::string name;
+
+				while(makesure != 1)
 				{
-					int makesure = 0;
-					std::string name;
+					std::cout <<"Enter first and last name:\n";
+					std::string firstName;
+					std::cin >> firstName;
+					std::string lastName;
+					std::cin >> lastName;
+					std::cout<<"\n";
+					name = firstName + " " + lastName;
 
-					while(makesure != 1)
-					{
-						std::cout <<"Enter first and last name:\n";
-						std::string firstName;
-						std::cin >> firstName;
-						std::string lastName;
-						std::cin >> lastName;
-						std::cout<<"\n";
-						name = firstName + " " + lastName;
-
-						std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
-						makesure = inputValidation(0,1);
-					}
+					std::cout<< "Is " << name << " correct? (0=No, 1=Yes): ";
+					makesure = inputValidation(0,1);
 				}
+			}
 				break;
 
 			//Print every individual schedule
-		case 4:
+			case 4:
 			{
 				std::cout<< "..........................................\n"
 					"Enter:\n"
-					"'1' for single day schedule for whole team.\n"
-					"'2' for whole week schedule for whole team.\n"
-					"'3' for whole week schedule for  one member.\n"
+					"'1' for single day schedule for whole group.\n"
+					"'2' for whole week schedule for whole group.\n"
+					"'3' for whole week schedule for one member.\n"
 					"'4' for single day schedule for one member.\n"
 					"'0' to return to main menu.\n"
 					"..........................................\n\n"
 					"Enter menu option: ";
+
 				int choice = inputValidation(0,4);
 				switch(choice)
 				{
+					//Single day schedule for team
 					case 1:
 					{
-						std::cout << "Enter a day: ";
+						std::cout << "Enter a group: ";
 						int day = inputValidation(1,7);
 						outputDaySchedule(group, day-1);
 					}
 					break;
+
+					//Whole week for team
 					case 2:
 					{
 						outputSchedule(group);
 					}
 					break;
+
+					//Whole week for 1 member
 					case 3:
 					{
 						printAllDays(group);
 					}
 					break;
+
+					//Single day for 1 member
 					case 4:
 					{
 						printOneDay(group);
 					}
 					break;
+
+				default:
+				break;
 				}
 			}
 			break;
@@ -1008,6 +1018,7 @@ bool personExists(std::vector<Person*> group, std::string name)
 				exists = true;
 			}
 		}
+
 	return exists;
 }
 
@@ -1054,12 +1065,20 @@ void editPerson(std::vector<Person*> group)
 			inputA = inputValidation(0,2);
 			switch(inputA)
 			{
-			case 1: //INSERT NEW TIME
+			//Insert a new time
+			case 1:
+			{
 				group.at(n)->insertTime();
-				break;
-			case 2: //DELETE SAVED TIME
+			}
+			break;
+
+			//Delete a time
+			case 2:
+			{
 				group.at(n)->deleteTime();
+			}
 				break;
+
 			default:
 			break;
 			}
@@ -1077,7 +1096,7 @@ int main()
 	std::cout<<"\n";
 	std::cout<<"Welcome to Team Planner! \n \n";
 	std::cout<<"Please note the following: \n";
-	std::cout<<"1. Start hour and end hour in  military time. \n";
+	std::cout<<"1. Start hour and end hour will be in  military time. \n";
 	std::cout<<"2. Monday through Sunday are represented by the number 1 through 7, respectively. \n";
 
 	scheduleManager start;
