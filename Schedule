@@ -655,8 +655,10 @@ public:
 	//(determines the day and times with the most overlapping time occurrences)
 	void ultimateSchedule(std::vector<Person*> group)
 	{
-		Day groupWeek[7];
+	Day groupWeek[7];
 		int timeoccurence = 0;
+		bool times = true;
+		std::string option;
 
 		//goes through every day of the week
 		for (int i = 0; i < 7; i++)
@@ -666,9 +668,9 @@ public:
 			{
 
 				/* goes through every time
-				 * -Calls insertTimeUltimateSchedule for each day of the week
-				 * 	with parameters of every existing start hour and end hour
-				 */
+				* -Calls insertTimeUltimateSchedule for each day of the week
+				* 	with parameters of every existing start hour and end hour
+				*/
 				for (int k = 0; k < group.at(j)->getDay(i).size(); k++)
 				{
 					int kStartHour = group.at(j)->getDay(i).at(k)->getStartHour();
@@ -689,29 +691,66 @@ public:
 		}
 
 		//outputs the best time to meet
-		std::cout<<"▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
+		std::cout << "▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
 		std::cout << "The best time for the group to meet is:\n\n";
-		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-		for (int i = 0; i < 7; i++)
+		const std::string dayName[] = { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+		while (times)
 		{
-			for (int k = 0; k < groupWeek[i].getTime().size(); k++)
+			for (int i = 0; i < 7; i++)
 			{
-				if (timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
+				/*if (timeoccurence == 0)
 				{
-					std::cout << "◦ "<<timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
-					groupWeek[i].getTime().at(k)->getStartHour();
-
-					//ensures that the times printed out are contiguous
-					while ((k + 1) < groupWeek[i].getTime().size() &&
-							timeoccurence == groupWeek[i].getTime().at(k+1)->getTimeoccurence() &&
-							groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
+					std::cout << "No schedules overlap.\n";
+					break;
+				}*/
+				for (int k = 0; k < groupWeek[i].getTime().size(); k++)
+				{
+					if (timeoccurence == groupWeek[i].getTime().at(k)->getTimeoccurence())
 					{
-						k++;
+						std::cout << "◦ " << timeoccurence + 1 << " member's schedules match on day " << dayName[i] << " at times " <<
+							groupWeek[i].getTime().at(k)->getStartHour();
+
+						//ensures that the times printed out are contiguous
+						while ((k + 1) < groupWeek[i].getTime().size() &&
+							timeoccurence == groupWeek[i].getTime().at(k + 1)->getTimeoccurence() &&
+							groupWeek[i].getTime().at(k)->getEndHour() == groupWeek[i].getTime().at(k + 1)->getStartHour())
+						{
+							k++;
+						}
+						std::cout << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
 					}
-					std::cout << " - " << groupWeek[i].getTime().at(k)->getEndHour() << "\n\n";
 				}
 			}
+
+			//gives the option to print out the next best time(s) to meet
+			if (timeoccurence - 1 > 0)
+			{
+				std::cout << "Would you like to see the next best time(s) to meet (enter yes or no): ";
+				std::cin >> option;
+				while (true)
+				{
+					if (option == "yes")
+					{
+						timeoccurence--;
+						break;
+					}
+					if (option == "no")
+					{
+						times = false;
+						break;
+					}
+					else
+					{
+						std::cout << "Enter either yes or no: ";
+						std::cin >> option;
+					}
+				}
+			
+			}
+			else
+				break;
 		}
+		
 		std::cout<<"▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ \n";
 		std::cout << "\n";
 
