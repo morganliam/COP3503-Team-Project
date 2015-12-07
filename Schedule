@@ -97,7 +97,6 @@ public:
 class Day
 {
 private:
-    //Person p;
     std::vector<Time*> today;
     std::vector<Time*>::iterator it;
 
@@ -933,14 +932,14 @@ scheduleManager()
 			{
 				editPerson(group);
 			}
-				break;
+			break;
 
 			//Print best times
 			case 6:
 			{
 				ultimateSchedule(group);
 			}
-				break;
+			break;
 
 			//Print history
 			case 7:
