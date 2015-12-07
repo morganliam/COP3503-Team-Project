@@ -472,6 +472,121 @@ public:
     }
 };
 
+void printOneDay(std::vector<Person*> group)
+{
+std::cout <<"Enter first and last name: \n";
+  std::string firstName; std::cin >> firstName;
+  std::string lastName; std::cin >> lastName;
+  std::cout<<"\n";
+
+  std::string name = firstName + " " + lastName;
+
+	int n = -1; // Stores index value of person in group
+
+	//Iterates through group vector, sets n to the index belonging to given person
+	for (unsigned int i = 0; i < group.size(); i++)
+	{
+		std::string pName = group.at(i)->getName();
+		if (pName == name)
+		{
+			n = i;
+		}
+	}
+	//n!=-1 when person exists in the group vector
+	if (n != -1)
+	{
+				std::cout<< "Enter day: ";
+				int day = inputValidation(1,7);
+				std::cout << group.at(n)->getName() << "'s schedule is: ";
+				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+				//Iterates through dayName array
+				std::cout << "\n\nOn " << dayName[day-1]<<" " ;
+
+					//Iterates through time vector in a day
+					for (int k = 0; k < group.at(n)->getDay(day-1).size(); k++)
+					{
+						//Comma formatting
+						if(k!=0)
+							std::cout << " , ";
+
+						std::cout << group.at(n)->getDay(day-1).at(k)->getStartHour() << "-";
+
+						//ensures that the times printed out are contiguous
+						while ((k+1) < group.at(n)->getDay(day-1).size() &&
+								group.at(n)->getDay(day-1).at(k)->getEndHour() == group.at(n)->getDay(day-1).at(k + 1)->getStartHour())
+						{
+							k++;
+						}
+						std::cout << group.at(n)->getDay(day-1).at(k)->getEndHour();
+						}
+				std::cout << "\n";
+
+			}
+	//n=-1 indicates person was not found
+	else
+	{
+		std::cout << name << " does not exist!\n\n";
+	}
+
+}
+
+void printAllDays(std::vector<Person*> group)
+{
+	std::cout <<"Enter first and last name: \n";
+  std::string firstName; std::cin >> firstName;
+  std::string lastName; std::cin >> lastName;
+  std::cout<<"\n";
+
+  std::string name = firstName + " " + lastName;
+
+	int n = -1; // Stores index value of person in group
+
+	//Iterates through group vector, sets n to the index belonging to given person
+	for (unsigned int i = 0; i < group.size(); i++)
+	{
+		std::string pName = group.at(i)->getName();
+		if (pName == name)
+		{
+			n = i;
+		}
+	}
+	//n!=-1 when person exists in the group vector
+	if (n != -1)
+	{
+				std::cout << group.at(n)->getName() << "'s schedule is: ";
+				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+				//Iterates through dayName array
+				for (int i = 0; i < 7; i++)
+				{
+					std::cout << "\n\nOn " << dayName[i]<<" " ;
+
+					//Iterates through time vector in a day
+					for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
+					{
+						//Comma formatting
+						if(k!=0)
+							std::cout << " , ";
+
+						std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
+
+						//ensures that the times printed out are contiguous
+						while ((k+1) < group.at(n)->getDay(i).size() &&
+								group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
+						{
+							k++;
+						}
+						std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
+						}
+				}
+				std::cout << "\n";
+	}
+	//n=-1 indicates person was not found
+	else
+	{
+		std::cout << name << " does not exist!\n\n";
+	}
+
+}
 
 class scheduleManager
 {
@@ -674,7 +789,7 @@ scheduleManager()
 				"2. to print member names.\n"
 				"3. to delete a member.\n"
 				"4. to print schedule.\n"
-				"5. to edit / view a member's schedule.\n"
+				"5. to edit a member's schedule.\n"
 				"6. to print best times to meet.\n"
 				"7. to print history.\n"
 				"0. to end.\n"
@@ -767,12 +882,14 @@ scheduleManager()
 			{
 				std::cout<< "..........................................\n"
 					"Enter:\n"
-					"'1' for single day schedule.\n"
-					"'2' for whole week schedule.\n"
+					"'1' for single day schedule for whole team.\n"
+					"'2' for whole week schedule for whole team.\n"
+					"'3' for whole week schedule for  one member.\n"
+					"'4' for single day schedule for one member.\n"
 					"'0' to return to main menu.\n"
 					"..........................................\n\n"
 					"Enter menu option: ";
-				int choice = inputValidation(0,2);
+				int choice = inputValidation(0,4);
 				switch(choice)
 				{
 					case 1:
@@ -787,10 +904,19 @@ scheduleManager()
 						outputSchedule(group);
 					}
 					break;
+					case 3:
+					{
+						printAllDays(group);
+					}
+					break;
+					case 4:
+					{
+						printOneDay(group);
+					}
+					break;
 				}
 			}
 			break;
-
 
 			// Edit schedule
 			case 5:
@@ -922,11 +1048,10 @@ void editPerson(std::vector<Person*> group)
 			std::cout<<".......................................... \n";
 			std::cout<<"Enter:\n1. to insert a time.\n"
 						"2. to delete a time.\n"
-						"3. to print schedule.\n"
 						"0. to return to the main menu.\n";
 			std::cout<<".......................................... \n";
 			std::cout<<"\nEnter menu option: ";
-			inputA = inputValidation(0,3);
+			inputA = inputValidation(0,2);
 			switch(inputA)
 			{
 			case 1: //INSERT NEW TIME
@@ -935,37 +1060,6 @@ void editPerson(std::vector<Person*> group)
 			case 2: //DELETE SAVED TIME
 				group.at(n)->deleteTime();
 				break;
-			case 3:
-			{
-				std::cout << group.at(n)->getName() << "'s schedule is: ";
-				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-				//Iterates through dayName array
-				for (int i = 0; i < 7; i++)
-				{
-					std::cout << "\n\nOn " << dayName[i]<<" " ;
-
-					//Iterates through time vector in a day
-					for (int k = 0; k < group.at(n)->getDay(i).size(); k++)
-					{
-						//Comma formatting
-						if(k!=0)
-							std::cout << " , ";
-
-						std::cout << group.at(n)->getDay(i).at(k)->getStartHour() << "-";
-
-						//ensures that the times printed out are contiguous
-						while ((k+1) < group.at(n)->getDay(i).size() &&
-								group.at(n)->getDay(i).at(k)->getEndHour() == group.at(n)->getDay(i).at(k + 1)->getStartHour())
-						{
-							k++;
-						}
-						std::cout << group.at(n)->getDay(i).at(k)->getEndHour();
-						}
-				}
-				std::cout << "\n";
-			}
-			break;
-
 			default:
 			break;
 			}
