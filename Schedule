@@ -495,31 +495,31 @@ std::cout <<"Enter first and last name: \n";
 	//n!=-1 when person exists in the group vector
 	if (n != -1)
 	{
-				std::cout<< "Enter day: ";
-				int day = inputValidation(1,7);
-				std::cout << group.at(n)->getName() << "'s schedule is: ";
-				const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-				//Iterates through dayName array
-				std::cout << "\n\nOn " << dayName[day-1]<<" " ;
+		std::cout<< "Enter day: ";
+		int day = inputValidation(1,7);
+		std::cout << group.at(n)->getName() << "'s schedule is: ";
+		const std:: string dayName[] = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+		//Iterates through dayName array
+		std::cout << "\n\nOn " << dayName[day-1]<<" " ;
 
-					//Iterates through time vector in a day
-					for (int k = 0; k < group.at(n)->getDay(day-1).size(); k++)
-					{
-						//Comma formatting
-						if(k!=0)
-							std::cout << " , ";
+			//Iterates through time vector in a day
+			for (int k = 0; k < group.at(n)->getDay(day-1).size(); k++)
+			{
+				//Comma formatting
+				if(k!=0)
+					std::cout << " , ";
 
-						std::cout << group.at(n)->getDay(day-1).at(k)->getStartHour() << "-";
+				std::cout << group.at(n)->getDay(day-1).at(k)->getStartHour() << "-";
 
-						//ensures that the times printed out are contiguous
-						while ((k+1) < group.at(n)->getDay(day-1).size() &&
-								group.at(n)->getDay(day-1).at(k)->getEndHour() == group.at(n)->getDay(day-1).at(k + 1)->getStartHour())
-						{
-							k++;
-						}
-						std::cout << group.at(n)->getDay(day-1).at(k)->getEndHour();
-						}
-				std::cout << "\n";
+				//ensures that the times printed out are contiguous
+				while ((k+1) < group.at(n)->getDay(day-1).size() &&
+						group.at(n)->getDay(day-1).at(k)->getEndHour() == group.at(n)->getDay(day-1).at(k + 1)->getStartHour())
+				{
+					k++;
+				}
+				std::cout << group.at(n)->getDay(day-1).at(k)->getEndHour();
+				}
+		std::cout << "\n";
 
 			}
 	//n=-1 indicates person was not found
